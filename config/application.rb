@@ -27,5 +27,9 @@ module IrInvestidor
 
     # Set default locale
     config.i18n.default_locale = 'pt-BR'
+
+    # Use Redis as cache store
+    config.cache_store = :redis_store,
+                         "#{Rails.application.secrets.redis_url}/cache"
   end
 end
