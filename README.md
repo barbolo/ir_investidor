@@ -30,12 +30,28 @@ traduzidos, como CBLC, CETIP ou RFB (Receita Federal do Brasil).
 
 ## Instruções para instalar o software
 
-A ser feito...
+> O texto desta seção é um rascunho e ainda não está pronto.
+
+```shell
+docker-compose pull # faz o download das imagens de Docker
+docker-compose build # cria imagens de Docker do projeto
+docker-compose run web bundle install # instala gems do projeto
+docker-compose run web rake db:create db:setup # cria e prepara o banco de dados
+```
 
 
 ## Instruções para executar o software
 
-A ser feito...
+> O texto desta seção é um rascunho e ainda não está pronto.
+
+```shell
+# o comando abaixo inicia os serviços da aplicação
+docker-compose up
+```
+
+Agora é só acessar o seguinte endereço em seu navegador de Internet:
+
+[http://localhost:3060](http://localhost:3060/)
 
 
 ## Contribuições

@@ -1,0 +1,27 @@
+version: '2'
+services:
+  db:
+    image: mysql:5.7.17
+    ports: # this opens the guest MySQL port to the host OS
+      - "3316:3316"
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    command: mysqld --port 3316
+
+  redis:
+    image: redis:3.2.6-alpine
+
+  web:
+    build: .
+    command: bin/rails server --port 3060 --binding 0.0.0.0
+    ports: # this opens the guest Rails port to the host OS
+      - "3060:3060"
+    links:
+      - db
+      - redis
+    volumes:
+      - .:/ir_investidor
+      - ir_investidor_vol:/bundle
+
+volumes:
+  ir_investidor_vol:
