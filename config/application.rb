@@ -21,5 +21,11 @@ module IrInvestidor
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
+
+    # Set time zone
+    config.time_zone = 'Brasilia'
+
+    # Set default locale
+    config.i18n.default_locale = 'pt-BR'
   end
 end
