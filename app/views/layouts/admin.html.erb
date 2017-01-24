@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>IRinvestidor - Calculadora de Imposto de Renda na Bovespa gratuita</title>
+
+  <!-- Default favicon -->
+  <link rel="icon" href="<%= image_path('favicon.png') %>">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- Simple Line Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" rel="stylesheet">
+  <!-- Application styles -->
+  <%= stylesheet_link_tag 'admin', media: 'all', 'data-turbolinks-track': 'reload' %>
+</head>
+
+<body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden footer-fixed">
+  <header class="app-header navbar">
+    <button class="navbar-toggler mobile-sidebar-toggler hidden-lg-up" type="button">☰</button>
+    <a class="navbar-brand" href="#"></a>
+    <ul class="nav navbar-nav hidden-md-down">
+      <li class="nav-item">
+        <a class="nav-link navbar-toggler sidebar-toggler" href="#">☰</a>
+      </li>
+    </ul>
+  </header>
+
+  <div class="app-body">
+    <div class="sidebar">
+      <nav class="sidebar-nav">
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link active" href="/"><i class="icon-home"></i> Início</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/todo"><i class="icon-map"></i> Recomendações</a>
+          </li>
+          <li class="divider"></li>
+          <li class="nav-title">Investimentos</li>
+          <li class="nav-item">
+            <a class="nav-link" href="/todo"><i class="icon-wallet"></i> Carteira atual</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/todo"><i class="icon-notebook"></i> Apurações</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/todo"><i class="icon-graph"></i> Relatórios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/todo"><i class="icon-event"></i> Declaração anual</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/todo"><i class="icon-doc"></i> Documentos</a>
+          </li>
+          <li class="divider"></li>
+          <li class="nav-title">Configurações</li>
+          <li class="nav-item">
+            <a class="nav-link" href="/todo"><i class="icon-target"></i> Estratégias</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/todo"><i class="icon-user"></i> Acesso</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/todo"><i class="icon-logout"></i> Sair</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main content -->
+    <main class="main">
+      <ol class="breadcrumb">
+        <% (ApplicationHelper::BREADCRUMB["#{controller_name}##{action_name}"] || []).each do |link| %>
+          <li class="breadcrumb-item <%= 'active' if link[:active] %>">
+            <% if link[:href].present? %>
+              <%= link_to link[:content], link[:href] %>
+            <% else %>
+              <%= link[:content] %>
+            <% end %>
+          </li>
+        <% end %>
+      </ol>
+      <div class="container-fluid">
+        <%= yield %>
+      </div> <!-- /.conainer-fluid -->
+    </main>
+  </div> <!-- /.app-body -->
+
+  <footer class="app-footer">
+    <strong>Versão:</strong> <small><%= app_version %></small>
+  </footer>
+
+  <!-- Bootstrap and necessary plugins -->
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
+
+  <!-- GenesisUI main scripts -->
+  <%= javascript_include_tag 'admin', 'data-turbolinks-track': 'reload' %>
+
+</body>
+
+</html>

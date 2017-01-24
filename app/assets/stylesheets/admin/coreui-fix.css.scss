@@ -1,0 +1,12 @@
+header.navbar .navbar-brand {
+  background-image: image-url("logo-ir-investidor.png");
+  background-size: 132px auto;
+}
+
+.sidebar ul.nav li.nav-item a.nav-link:hover {
+  background-color: #c71b1a !important;
+}
+
+.sidebar ul.nav li.nav-item a.nav-link.active i {
+  color: #f52d2c;
+}
