@@ -83,7 +83,22 @@
           </li>
         <% end %>
       </ol>
+
       <div class="container-fluid">
+        <% if (msg = notice).present? %>
+          <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Atenção!</strong> <%= msg %>
+          </div>
+        <% end %>
+
+        <% if (msg = alert).present? %>
+          <div class="alert alert-danger alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Ops!</strong> <%= msg %>
+          </div>
+        <% end %>
+
         <%= yield %>
       </div> <!-- /.conainer-fluid -->
     </main>
@@ -93,15 +108,16 @@
     <strong>Versão:</strong> <small><%= app_version %></small>
   </footer>
 
+  <!--  Scripts placed at the end of the document so the pages load faster -->
+
   <!-- Bootstrap and necessary plugins -->
   <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
 
-  <!-- GenesisUI main scripts -->
+  <!-- Application -->
   <%= javascript_include_tag 'admin', 'data-turbolinks-track': 'reload' %>
-
+  <%= yield :javascripts %>
 </body>
-
 </html>
