@@ -57,11 +57,11 @@ Agora é só acessar o seguinte endereço em seu navegador de Internet:
 ## Contribuições
 
 Se encontrar algum problema ou tiver alguma sugestão, você pode
-[criar uma Issue](https://github.com/barbolo/ir_investidor/issues/new) no GitHub
+[criar uma Issue](https://github.com/infosimples/ir_investidor/issues/new) no GitHub
 para ser analisada.
 
 Se desejar contribuir com o desenvolvimento deste software, basta enviar um
-[Pull Request](https://github.com/barbolo/ir_investidor/pulls) para que a
+[Pull Request](https://github.com/infosimples/ir_investidor/pulls) para que a
 alteração seja analisada e possivelmente integrada ao código fonte original.
 
 
@@ -72,4 +72,4 @@ quiser com este software desde que você inclua a licença original em produtos
 derivados e não responsabilize os autores originais por qualquer tipo de
 prejuízo.
 
-https://github.com/barbolo/ir_investidor/raw/master/LICENSE
+https://github.com/infosimples/ir_investidor/raw/master/LICENSE
