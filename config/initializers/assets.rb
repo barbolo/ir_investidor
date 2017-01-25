@@ -9,5 +9,8 @@ Rails.application.config.assets.version = '1.0'
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
 
+# Precompile CoreUI assets
+Rails.application.config.assets.precompile += %w(coreui/style.css coreui/app.js)
+
 # Precompile Admin assets
 Rails.application.config.assets.precompile += %w(admin.css admin.js)

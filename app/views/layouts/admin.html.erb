@@ -4,15 +4,21 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>IRinvestidor - Calculadora de Imposto de Renda na Bovespa gratuita</title>
+  <title>IR Investidor - Calculadora de Imposto de Renda na Bovespa gratuita</title>
+  <%= csrf_meta_tags %>
 
   <!-- Default favicon -->
   <link rel="icon" href="<%= image_path('favicon.png') %>">
 
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
   <!-- Simple Line Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" rel="stylesheet">
+
+  <!-- CoreUI styles -->
+  <%= stylesheet_link_tag 'coreui/style', media: 'all', 'data-turbolinks-track': 'reload' %>
+
   <!-- Application styles -->
   <%= stylesheet_link_tag 'admin', media: 'all', 'data-turbolinks-track': 'reload' %>
 </head>
@@ -88,14 +94,14 @@
         <% if (msg = notice).present? %>
           <div class="alert alert-warning alert-dismissible" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <strong>Atenção!</strong> <%= msg %>
+            <%= msg %>
           </div>
         <% end %>
 
         <% if (msg = alert).present? %>
           <div class="alert alert-danger alert-dismissible" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <strong>Ops!</strong> <%= msg %>
+            <%= msg %>
           </div>
         <% end %>
 
@@ -115,6 +121,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
+
+  <!-- CoreUI -->
+  <%= javascript_include_tag 'coreui/app', 'data-turbolinks-track': 'reload' %>
 
   <!-- Application -->
   <%= javascript_include_tag 'admin', 'data-turbolinks-track': 'reload' %>

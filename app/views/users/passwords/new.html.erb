@@ -1,0 +1,30 @@
+<div class="row">
+  <div class="col-lg-5 m-x-auto pull-xs-none vamiddle">
+    <div class="card">
+      <div class="card-block p-a-2">
+        <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+          <h1>Criar uma senha nova</h1>
+          <p class="text-muted">Informe seu email para criar uma nova senha</p>
+
+          <% if (msg = devise_error_messages!).present? %>
+            <div class="alert alert-danger" role="alert"><%= msg %></div>
+          <% end %>
+
+          <div class="input-group m-b-1">
+            <span class="input-group-addon">@</span>
+            <%= f.email_field :email, class: 'form-control', placeholder: 'Email', autofocus: true %>
+          </div>
+          <button type="submit" class="btn btn-block btn-success">Receber instruções por email</button>
+        <% end %>
+      </div> <!-- /.card-block -->
+    </div> <!-- /.card -->
+  </div> <!-- /.vamiddle -->
+</div> <!-- /.row -->
+
+<div class="row">
+  <div class="col-lg-8 m-x-auto pull-xs-none">
+    <div class="devise-other-options">
+      <%= link_to 'Você sabe a sua senha? Entre aqui', new_session_path(resource_name), class: 'btn btn-link' %>
+    </div>
+  </div>
+</div>

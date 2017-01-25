@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Acesse a sua conta no IR Investidor. Calcule o imposto de renda de seus investimentos gratuitamente.">
+  <title>IR Investidor - Acesse a sua conta</title>
+  <%= csrf_meta_tags %>
+
+  <!-- Default favicon -->
+  <link rel="icon" href="<%= image_path('favicon.png') %>">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <!-- Simple Line Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" rel="stylesheet">
+
+  <!-- CoreUI styles -->
+  <%= stylesheet_link_tag 'coreui/style', media: 'all', 'data-turbolinks-track': 'reload' %>
+
+  <!-- Application styles -->
+  <%= stylesheet_link_tag 'admin', media: 'all', 'data-turbolinks-track': 'reload' %>
+</head>
+<body class="devise">
+  <div class="container">
+    <div id="flash">
+    <%= session[:devise_flash_notice] %>
+      <% if (msg = notice).present? %>
+        <br>
+        <div clas="row">
+          <div class="col-lg-8 m-x-auto pull-xs-none">
+            <div class="alert alert-warning alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <%= msg %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <% if (msg = alert).present? %>
+        <br>
+        <div clas="row">
+          <div class="col-lg-8 m-x-auto pull-xs-none">
+            <div class="alert alert-danger alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <%= msg %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%= yield %>
+  </div> <!-- /.container -->
+
+  <!--  Scripts placed at the end of the document so the pages load faster -->
+
+  <!-- Bootstrap and necessary plugins -->
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
+
+  <!-- CoreUI -->
+  <%= javascript_include_tag 'coreui/app', 'data-turbolinks-track': 'reload' %>
+
+  <!-- Application -->
+  <%= javascript_include_tag 'admin', 'data-turbolinks-track': 'reload' %>
+  <%= yield :javascripts %>
+
+  <script>
+  function verticalAlignMiddle()
+  {
+      var bodyHeight = $(window).height();
+      var formHeight = $('.vamiddle').height();
+      var flashHeight = $('#flash').height();
+      var marginTop = (bodyHeight / 2) - (formHeight / 2) - flashHeight;
+      if (marginTop > 0)
+      {
+          $('.vamiddle').css('margin-top', marginTop);
+      }
+  }
+  $(document).ready(function()
+  {
+      verticalAlignMiddle();
+  });
+  $(window).bind('resize', verticalAlignMiddle);
+  </script>
+</body>
+</html>

@@ -14,8 +14,6 @@ recolhimento de IR
 - As regras de cáculos de impostos devem ser facilmente entendidas através do
 código fonte
 - Não deve guardar dados pessoais identificáveis (como nome ou CPF)
-- Usuário único (i.e, só é possível calcular IR para uma pessoa para cada
-instalação)
 - Deve ser possível importar/exportar arquivo de backup com todos os dados
 - Deve ser possível integrar provedores de armazenamento em nuvem para guardar
 documentos usados nos cálculos, como notas de corretagem. Exemplos: Dropbox,
