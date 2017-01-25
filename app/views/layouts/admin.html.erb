@@ -23,13 +23,13 @@
   <%= stylesheet_link_tag 'admin', media: 'all', 'data-turbolinks-track': 'reload' %>
 </head>
 
-<body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden footer-fixed">
-  <header class="app-header navbar">
-    <button class="navbar-toggler mobile-sidebar-toggler hidden-lg-up" type="button">☰</button>
+<body class="navbar-fixed sidebar-nav fixed-nav footer-fixed">
+  <header class="navbar">
+    <button class="navbar-toggler mobile-toggler hidden-lg-up" type="button">&#9776;</button>
     <a class="navbar-brand" href="#"></a>
     <ul class="nav navbar-nav hidden-md-down">
       <li class="nav-item">
-        <a class="nav-link navbar-toggler sidebar-toggler" href="#">☰</a>
+        <a class="nav-link navbar-toggler layout-toggler" href="#">&#9776;</a>
       </li>
     </ul>
   </header>
@@ -110,8 +110,8 @@
     </main>
   </div> <!-- /.app-body -->
 
-  <footer class="app-footer">
-    <strong>Versão:</strong> <small><%= app_version %></small>
+  <footer class="footer">
+    <small>Versão: <%= app_version.to_s[0,7] %></small>.
   </footer>
 
   <!--  Scripts placed at the end of the document so the pages load faster -->

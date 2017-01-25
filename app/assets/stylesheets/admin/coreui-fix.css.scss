@@ -1,12 +1,23 @@
-header.navbar .navbar-brand {
+header.navbar a.navbar-brand {
   background-image: image-url("logo-ir-investidor.png");
-  background-size: 132px auto;
+  background-size: 100px auto;
 }
 
-.sidebar ul.nav li.nav-item a.nav-link:hover {
+body:not(.top-nav) .sidebar ul.nav li.nav-item a.nav-link:hover {
   background-color: #c71b1a !important;
 }
 
-.sidebar ul.nav li.nav-item a.nav-link.active i {
+body:not(.top-nav) .sidebar ul.nav li.nav-item a.nav-link.active i {
   color: #f52d2c;
+}
+
+.footer-fixed footer.footer {
+  position: fixed;
+  bottom: 0;
+  z-index: 1000;
+  width: 100%;
+}
+
+.footer-fixed .app-body {
+  margin-bottom: 50px;
 }

@@ -1,11 +1,10 @@
 module ApplicationHelper
+  APP_VERSION = `git log --pretty=%H`.split("\n").first
   BREADCRUMB = {
     'dashboard#index' => [{content: 'Início', active: true}]
   }
 
   def app_version
-    Rails.cache.fetch('app_version') do
-      `git log --pretty=%H`.split("\n").first
-    end
+    APP_VERSION
   end
 end
