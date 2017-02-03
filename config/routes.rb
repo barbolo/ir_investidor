@@ -8,4 +8,8 @@ Rails.application.routes.draw do
     sessions: 'users/sessions',
     unlocks: 'users/unlocks',
   }
+
+  resources :books, only: [:index, :new, :create] do
+    patch 'update_all', on: :collection
+  end
 end

@@ -39,7 +39,7 @@
       <nav class="sidebar-nav">
         <ul class="nav">
           <li class="nav-item">
-            <a class="nav-link active" href="/"><i class="icon-home"></i> Início</a>
+            <%= menu_link_to '<i class="icon-home"></i> Início', 'dashboard', 'index' %>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/todo"><i class="icon-map"></i> Recomendações</a>
@@ -64,13 +64,15 @@
           <li class="divider"></li>
           <li class="nav-title">Configurações</li>
           <li class="nav-item">
-            <a class="nav-link" href="/todo"><i class="icon-target"></i> Estratégias</a>
+            <%= menu_link_to '<i class="icon-target"></i> Estratégias', 'books', 'index', controller_name == 'books' %>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/todo"><i class="icon-user"></i> Acesso</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/todo"><i class="icon-logout"></i> Sair</a>
+            <%= link_to destroy_user_session_path, class: 'nav-link' do %>
+              <i class="icon-logout"></i> Sair
+            <% end %>
           </li>
         </ul>
       </nav>
@@ -88,6 +90,7 @@
             <% end %>
           </li>
         <% end %>
+        <%= yield :action_buttons %>
       </ol>
 
       <div class="container-fluid">

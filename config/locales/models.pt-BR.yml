@@ -5,10 +5,20 @@ pt-BR:
       user:
         one: usuário
         other: usuários
+      book:
+        one: estratégia
+        other: estratégias
 
     attributes:
       user:
         email: email
         password: senha
         password_confirmation: confirmação de senha
+      book:
+        name: nome da estratégia
+        user_id: id do usuário
+        user: usuário
+        parent_id: id da estratégia pai
+        parent: estratégia pai
+        position: posição
 

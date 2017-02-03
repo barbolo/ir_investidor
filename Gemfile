@@ -27,7 +27,7 @@ gem 'jquery-rails'
 gem 'turbolinks', '~> 5'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.5'
+# gem 'jbuilder', '~> 2.5'
 
 # Use Redis as cache/session store
 gem 'redis-rails'
