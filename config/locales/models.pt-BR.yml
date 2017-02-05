@@ -8,6 +8,9 @@ pt-BR:
       book:
         one: estratégia
         other: estratégias
+      broker:
+        one: corretora
+        other: corretoras
 
     attributes:
       user:
@@ -21,4 +24,7 @@ pt-BR:
         parent_id: id da estratégia pai
         parent: estratégia pai
         position: posição
-
+      broker:
+        name: nome
+        cnpj: CNPJ
+        search_terms: termos de busca
