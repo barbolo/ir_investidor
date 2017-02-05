@@ -8,6 +8,9 @@ class Broker < ApplicationRecord
   # If your broker is not listed in the link above, open an issue or send a pull
   # request.
 
+  # Associations
+  has_many :user_brokers
+
   # Scopes
   default_scope { order(:name) }
 
@@ -19,13 +22,17 @@ class Broker < ApplicationRecord
   # Callbacks
   before_validation :set_search_terms
 
+  def formatted_cnpj
+    cnpj.to_s.gsub(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/) { "#{$1}.#{$2}.#{$3}/#{$4}-#{$5}" }
+  end
+
   private
     def set_search_terms
       terms = []
       terms << name
       terms << name.to_s.gsub(/[^a-z0-9 ]/i, '')
       terms << cnpj
-      terms << cnpj.to_s.gsub(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/) { "#{$1}.#{$2}.#{$3}/#{$4}-#{$5}" }
+      terms << formatted_cnpj
       self.search_terms = terms.uniq.join(' ')
     end
 end

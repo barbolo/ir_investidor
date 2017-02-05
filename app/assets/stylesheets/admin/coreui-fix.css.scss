@@ -17,3 +17,9 @@ body:not(.top-nav) .sidebar ul.nav li.nav-item a.nav-link.active i {
   z-index: 1000;
   width: 100%;
 }
+
+.card.card-info a {
+  color: #fff;
+  text-decoration: underline;
+  &:hover { color: #eef; }
+}

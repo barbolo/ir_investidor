@@ -38,31 +38,27 @@
     <div class="sidebar">
       <nav class="sidebar-nav">
         <ul class="nav">
-          <li class="nav-item">
-            <%= menu_link_to '<i class="icon-home"></i> Início', 'dashboard', 'index' %>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/todo"><i class="icon-map"></i> Recomendações</a>
-          </li>
-          <li class="divider"></li>
           <li class="nav-title">Investimentos</li>
           <li class="nav-item">
-            <a class="nav-link" href="/todo"><i class="icon-wallet"></i> Carteira atual</a>
+            <a class="nav-link" href="/todo"><i class="icon-wallet"></i> Minha carteira</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/todo"><i class="icon-notebook"></i> Apurações</a>
+            <a class="nav-link" href="/todo"><i class="icon-notebook"></i> Operações</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/todo"><i class="icon-event"></i> Impostos</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/todo"><i class="icon-graph"></i> Relatórios</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/todo"><i class="icon-event"></i> Declaração anual</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/todo"><i class="icon-doc"></i> Documentos</a>
           </li>
           <li class="divider"></li>
           <li class="nav-title">Configurações</li>
+          <li class="nav-item">
+            <%= menu_link_to '<i class="icon-globe"></i> Corretoras', 'user_brokers', 'index', controller_name == 'user_brokers' %>
+          </li>
           <li class="nav-item">
             <%= menu_link_to '<i class="icon-target"></i> Estratégias', 'books', 'index', controller_name == 'books' %>
           </li>

@@ -11,6 +11,9 @@ pt-BR:
       broker:
         one: corretora
         other: corretoras
+      user_broker:
+        one: conta em corretora
+        other: contas em corretoras
 
     attributes:
       user:
@@ -28,3 +31,9 @@ pt-BR:
         name: nome
         cnpj: CNPJ
         search_terms: termos de busca
+      user_broker:
+        user: usuário
+        user_id: id do usuário
+        broker: corretora
+        broker_id: corretora
+        name: nome para identificação

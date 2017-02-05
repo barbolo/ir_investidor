@@ -12,4 +12,6 @@ Rails.application.routes.draw do
   resources :books, only: [:index, :new, :create] do
     patch 'update_all', on: :collection
   end
+
+  resources :user_brokers, except: [:show]
 end

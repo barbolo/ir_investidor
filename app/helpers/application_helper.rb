@@ -8,7 +8,16 @@ module ApplicationHelper
     'books#index' => [{ content: 'Estratégias' },
                       { content: 'Configuração', active: true}],
     'books#new' => [{ content: 'Estratégias', href: URLS.books_path },
-                    { content: 'Nova estratégia', active: true}]
+                    { content: 'Nova estratégia', active: true}],
+    'user_brokers#index' => [{ content: 'Corretoras', active: true }],
+    'user_brokers#new' => [{ content: 'Corretoras', href: URLS.user_brokers_path },
+                           { content: 'Nova corretora', active: true}],
+    'user_brokers#create' => [{ content: 'Corretoras', href: URLS.user_brokers_path },
+                              { content: 'Nova corretora', active: true}],
+    'user_brokers#edit' => [{ content: 'Corretoras', href: URLS.user_brokers_path },
+                            { content: 'Editar corretora', active: true}],
+    'user_brokers#update' => [{ content: 'Corretoras', href: URLS.user_brokers_path },
+                              { content: 'Editar corretora', active: true}],
   }
 
   def app_version
