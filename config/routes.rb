@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   root to: 'dashboard#index'
 
+  get 'account', to: 'dashboard#account'
+  patch 'account', to: 'dashboard#update_account'
+
   devise_for :users, controllers: {
     confirmations: 'users/confirmations',
     passwords: 'users/passwords',
