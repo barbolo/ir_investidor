@@ -23,5 +23,15 @@ services:
       - .:/ir_investidor
       - ir_investidor_vol:/bundle
 
+  sidekiq:
+    build: .
+    command: bundle exec sidekiq -C config/sidekiq.yml.erb
+    links:
+      - db
+      - redis
+    volumes:
+      - .:/ir_investidor
+      - ir_investidor_vol:/bundle
+
 volumes:
   ir_investidor_vol:

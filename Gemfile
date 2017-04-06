@@ -33,6 +33,11 @@ gem 'turbolinks', '~> 5'
 gem 'redis-rails'
 gem 'connection_pool'
 
+# Use Sidekiq for background jobs
+gem 'sidekiq'
+gem 'sidekiq-limit_fetch'
+gem 'sidekiq-cron'
+
 # Use Devise as a flexible authentication solution
 gem 'devise'
 

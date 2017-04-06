@@ -1,0 +1,11 @@
+---
+:concurrency: 5
+:logfile:     log/sidekiq.log
+:pidfile:     tmp/pids/sidekiq.pid
+production:
+  :concurrency: 25
+:queues:
+  - default
+  - database_changes
+:limits:
+  database_changes: 3
