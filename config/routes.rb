@@ -17,4 +17,6 @@ Rails.application.routes.draw do
   end
 
   resources :user_brokers, except: [:show]
+
+  resources :transactions, except: [:show]
 end

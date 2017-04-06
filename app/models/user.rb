@@ -10,6 +10,7 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :books, allow_destroy: true,
     reject_if: lambda { |attributes| attributes['name'].blank? }
   has_many :user_brokers, dependent: :destroy
+  has_many :transactions, dependent: :destroy
 
   # Callbacks
   after_create { Book.initialize_books(self) }

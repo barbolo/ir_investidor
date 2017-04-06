@@ -7,6 +7,7 @@ class UserBroker < ApplicationRecord
   # Associations
   belongs_to :user
   belongs_to :broker
+  has_many :transactions
 
   # Validations
   validates :user, presence: true

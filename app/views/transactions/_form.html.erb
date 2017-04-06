@@ -1,0 +1,123 @@
+<% if transaction.errors.any? %>
+  <div class="card card-inverse card-danger">
+    <div class="card-header">
+      <%= pluralize(transaction.errors.count, 'erro impediu', 'erros impediram') %> salvar os dados:
+  </div>
+    <div class="card-block">
+      <ul>
+        <% transaction.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>
+
+<% operation_defined = transaction.operation_defined? %>
+
+<%= form_for(transaction) do |f| %>
+  <div class="card">
+    <div class="card-header">
+      <strong><%= transaction.persisted? ? 'Editar' : 'Nova' %> operação</strong>
+    </div>
+    <div class="card-block">
+      <% if !transaction.persisted? && @can_submit %>
+        <div class="alert alert-info" role="alert">Confirme os valores para salvar a operação!</div>
+      <% end %>
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <%= f.label :user_broker_id %>
+            <%= f.select :user_broker_id, current_user.user_brokers.all.map { |b| [b.name, b.id] }, {}, class: 'form-control', readonly: operation_defined %>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <%= f.label :asset %>
+            <%= f.select :asset, Transaction::ASSET.map { |code, db| [t(code, scope: 'constants.asset'), db] }, {}, class: 'form-control', readonly: operation_defined %>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <%= f.label :operation %>
+            <%= f.select :operation, Transaction::OPERATION.map { |code, db| [t(code, scope: 'constants.operation'), db] }, {}, class: 'form-control', readonly: operation_defined %>
+          </div>
+        </div>
+      </div>
+
+      <% if operation_defined %>
+        <%= render "transactions/forms/#{transaction.asset}_#{transaction.operation}", locals: {transaction: transaction, f: f} %>
+      <% end %>
+
+      <% if @can_submit %>
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="form-group">
+              <%= f.label :costs %>
+              <div class="controls">
+                <div class="input-prepend input-group">
+                  <span class="input-group-addon">R$</span>
+                  <%= f.text_field :costs, value: number_with_precision(transaction.costs, precision: 2), class: 'form-control money brl', readonly: true %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <%= f.label :irrf %>
+              <div class="controls">
+                <div class="input-prepend input-group">
+                  <span class="input-group-addon">R$</span>
+                  <%= f.text_field :irrf, value: number_with_precision(transaction.irrf, precision: 2), class: 'form-control money brl' %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <%= f.label :costs_breakdown %>
+            </div>
+          </div>
+        </div>
+
+        <% transaction.costs_breakdown.each do |key, value| %>
+          <div class="row">
+            <div class="col-sm-3">
+              <div class="form-group">
+                <div class="controls">
+                  <div class="input-prepend input-group">
+                    <%= text_field_tag "transaction[costs_breakdown][keys][]", key, class: 'form-control' %>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <div class="controls">
+                  <div class="input-prepend input-group">
+                    <span class="input-group-addon">R$</span>
+                    <%= text_field_tag "transaction[costs_breakdown][values][]", number_with_precision(value, precision: 2), class: 'form-control money brl' %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+
+
+    </div>
+    <div class="card-footer">
+      <% if transaction.persisted? || @can_submit %>
+        <%= hidden_field_tag :do_submit, true %>
+        <%= f.submit class: 'btn btn-sm btn-primary' %>
+      <% else %>
+        <%= f.submit value: 'Avançar', class: 'btn btn-sm btn-primary' %>
+      <% end %>
+      <%= link_to 'Voltar', transactions_path, class: 'btn btn-sm btn-secondary' %>
+    </div>
+  </div>
+<% end %>

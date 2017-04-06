@@ -16,6 +16,9 @@
   <!-- Simple Line Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" rel="stylesheet">
 
+  <!-- Other styles -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.45/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+
   <!-- CoreUI styles -->
   <%= stylesheet_link_tag 'coreui/style', media: 'all', 'data-turbolinks-track': 'reload' %>
 
@@ -43,7 +46,7 @@
             <a class="nav-link" href="/todo"><i class="icon-wallet"></i> Minha carteira</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/todo"><i class="icon-notebook"></i> Operações</a>
+            <%= menu_link_to '<i class="icon-chart"></i> Operações', 'transactions', 'index', controller_name == 'transactions' %>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/todo"><i class="icon-event"></i> Impostos</a>
@@ -120,6 +123,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-maskmoney/3.0.2/jquery.maskMoney.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/locale/pt-br.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.45/js/bootstrap-datetimepicker.min.js"></script>
 
   <!-- CoreUI -->
   <%= javascript_include_tag 'coreui/app', 'data-turbolinks-track': 'reload' %>

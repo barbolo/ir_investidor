@@ -1,5 +1,5 @@
 class UserBrokersController < ApplicationController
-  before_action :set_user_broker, only: [:show, :edit, :update, :destroy]
+  before_action :set_user_broker, only: [:edit, :update, :destroy]
 
   # GET /user_brokers
   def index

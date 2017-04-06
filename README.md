@@ -3,6 +3,21 @@
 IR Investidor é uma aplicação web que auxilia investidores brasileiros (Pessoa
 Física) a calcular Imposto de Renda com aplicações de renda fixa e variável.
 
+## Investimentos suportados
+
+> Work Still In Progress!
+
+|Investimento          |Suportado|
+|----------------------|---------|
+|Ação - Normal         |&#10004; |
+|Ação - Daytrade       |         |
+|Opção                 |         |
+|Fundo de Investimento |         |
+|Fundo Imobiliário     |         |
+|Futuro                |         |
+|Renda Fixa            |         |
+|Termo                 |         |
+
 
 ## Intenções
 

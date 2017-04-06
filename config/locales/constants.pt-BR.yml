@@ -1,0 +1,9 @@
+---
+pt-BR:
+  constants:
+    asset:
+      stock: Ação
+
+    operation:
+      buy: Compra
+      sell: Venda

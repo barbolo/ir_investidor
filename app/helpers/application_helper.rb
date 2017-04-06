@@ -28,6 +28,14 @@ module ApplicationHelper
     'user_brokers#update' => [{ content: 'Configurações' },
                               { content: 'Corretoras', href: URLS.user_brokers_path },
                               { content: 'Editar corretora', active: true}],
+    'transactions#index' => [{ content: 'Investimentos' },
+                             { content: 'Operações', active: true }],
+    'transactions#new' => [{ content: 'Investimentos' },
+                           { content: 'Operações', href: URLS.transactions_path },
+                           { content: 'Nova operação', active: true}],
+    'transactions#create' => [{ content: 'Investimentos' },
+                              { content: 'Operações', href: URLS.transactions_path },
+                              { content: 'Nova operação', active: true}],
   }
 
   def app_version

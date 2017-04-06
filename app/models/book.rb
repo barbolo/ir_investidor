@@ -26,6 +26,7 @@ class Book < ApplicationRecord
   has_many :children, class_name: 'Book', foreign_key: 'parent_id',
            dependent: :destroy
   belongs_to :parent, class_name: 'Book', required: false
+  has_many :transactions
 
   # Scopes
   default_scope { order(:position) }

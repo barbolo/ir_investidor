@@ -1,0 +1,66 @@
+<% content_for :action_buttons do %>
+  <li class="breadcrumb-menu">
+    <div class="btn-group" role="group">
+      <%= link_to new_transaction_path, class: 'btn btn-secondary' do %>
+        <i class="fa fa-plus-circle"></i> &nbsp;Nova operação
+      <% end %>
+    </div>
+  </li>
+<% end %>
+
+<div class="card">
+  <div class="card-header">
+    Operações
+  </div>
+  <div class="card-block">
+    <% if @transactions.size > 0 %>
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th>Estratégia</th>
+            <th>Conta</th>
+            <th>Operação</th>
+            <th>Classe</th>
+            <th>Ativo</th>
+            <th>Preço</th>
+            <th>Quantidade</th>
+            <th>Valor</th>
+            <th>Data</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @transactions.each do |transaction| %>
+            <tr>
+              <td><%= transaction.book.name %></td>
+              <td><%= transaction.user_broker.name %></td>
+              <td><%= transaction.operation_name %></td>
+              <td><%= transaction.asset_class_name %></td>
+              <td><%= transaction.asset_name %></td>
+              <td><%= number_to_currency transaction.price %></td>
+              <td><%= transaction.quantity %></td>
+              <td><%= number_to_currency transaction.value %></td>
+              <td><%= l transaction.operation_at %></td>
+              <td>
+                <%= link_to edit_transaction_path(transaction), class: 'btn btn-sm btn-outline-primary' do %>
+                  <i class="fa fa-edit"></i> Editar
+                <% end %>
+                <%= link_to transaction, method: :delete, data: { confirm: 'Tem certeza que deseja remover?' }, class: 'btn btn-sm btn-outline-danger' do %>
+                  <i class="fa fa-trash"></i> Remover
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="card card-inverse card-info">
+        <div class="card-block">
+          <blockquote class="card-blockquote">
+            <p>Você ainda não informou nenhuma operação! <%= link_to 'Clique aqui', new_transaction_path %> e informe uma agora.</p>
+          </blockquote>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

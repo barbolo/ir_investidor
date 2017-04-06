@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170205134110) do
+ActiveRecord::Schema.define(version: 20170206171211) do
 
   create_table "books", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name"
@@ -31,6 +31,35 @@ ActiveRecord::Schema.define(version: 20170205134110) do
     t.datetime "updated_at",                 null: false
     t.index ["cnpj"], name: "index_brokers_on_cnpj", unique: true, using: :btree
     t.index ["name"], name: "index_brokers_on_name", using: :btree
+  end
+
+  create_table "transactions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "user_id"
+    t.integer  "user_broker_id"
+    t.integer  "book_id"
+    t.string   "asset",           limit: 5
+    t.string   "operation",       limit: 5
+    t.string   "name",            limit: 100
+    t.string   "ticker"
+    t.decimal  "fixed_rate",                    precision: 5,  scale: 2
+    t.string   "index_name"
+    t.decimal  "index_rate",                    precision: 5,  scale: 4
+    t.integer  "quantity"
+    t.decimal  "price",                         precision: 7,  scale: 2
+    t.decimal  "value",                         precision: 10, scale: 2
+    t.text     "costs_breakdown", limit: 65535
+    t.decimal  "costs",                         precision: 8,  scale: 2
+    t.decimal  "irrf",                          precision: 8,  scale: 2
+    t.date     "operation_at"
+    t.date     "settlement_at"
+    t.date     "expire_at"
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.index ["book_id"], name: "index_transactions_on_book_id", using: :btree
+    t.index ["operation_at", "user_id", "book_id"], name: "index_transactions_on_operation_at_and_user_id_and_book_id", using: :btree
+    t.index ["user_broker_id"], name: "index_transactions_on_user_broker_id", using: :btree
+    t.index ["user_id", "expire_at"], name: "index_transactions_on_user_id_and_expire_at", using: :btree
+    t.index ["user_id"], name: "index_transactions_on_user_id", using: :btree
   end
 
   create_table "user_brokers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -69,6 +98,9 @@ ActiveRecord::Schema.define(version: 20170205134110) do
   end
 
   add_foreign_key "books", "users"
+  add_foreign_key "transactions", "books"
+  add_foreign_key "transactions", "user_brokers"
+  add_foreign_key "transactions", "users"
   add_foreign_key "user_brokers", "brokers"
   add_foreign_key "user_brokers", "users"
 end
