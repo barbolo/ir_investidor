@@ -1,3 +1,6 @@
+require 'sidekiq/web'
+require 'sidekiq/cron/web'
+
 Rails.application.routes.draw do
   root to: 'dashboard#index'
 
@@ -22,4 +25,10 @@ Rails.application.routes.draw do
 
   get 'holdings', to: 'holdings#index', as: :holdings
   get 'holdings/calc', to: 'holdings#calc', as: :holdings_calc
+
+  # Sidekiq Web UI
+  authenticate :user do
+    mount Sidekiq::Web => '/sidekiq-admin'
+  end
+  Sidekiq::Web.set :session_secret, Rails.application.secrets.secret_key_base
 end
