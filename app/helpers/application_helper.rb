@@ -36,6 +36,14 @@ module ApplicationHelper
     'transactions#create' => [{ content: 'Investimentos' },
                               { content: 'Operações', href: URLS.transactions_path },
                               { content: 'Nova operação', active: true}],
+    'transactions#edit' => [{ content: 'Investimentos' },
+                            { content: 'Operações', href: URLS.transactions_path },
+                            { content: 'Editar operação', active: true}],
+    'transactions#update' => [{ content: 'Investimentos' },
+                              { content: 'Operações', href: URLS.transactions_path },
+                              { content: 'Editar operação', active: true}],
+    'holdings#index' => [{ content: 'Investimentos' },
+                         { content: 'Posições', active: true }]
   }
 
   def app_version

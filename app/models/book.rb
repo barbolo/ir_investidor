@@ -21,12 +21,17 @@ class Book < ApplicationRecord
   # the user's account. It can be changed later by the user with whatever she
   # thinks is best for organizing her portfolio.
 
+  COLORS = %w(#4abdac #a239ca #f7b733 #fc4a1a #8c52ff #e16eff #ff55a2 #9a6447
+              #739a55 #461d16 #740000 #4b2c51 #0f1569 #b25454 #4e7b85 #4885ed
+              #f24333 #b3d94e #d13446 #008fff #b72a62 #525300 #dd745a #8fa0bf)
+
   # Associations
   belongs_to :user, inverse_of: :books
   has_many :children, class_name: 'Book', foreign_key: 'parent_id',
            dependent: :destroy
   belongs_to :parent, class_name: 'Book', required: false
   has_many :transactions
+  has_many :holdings
 
   # Scopes
   default_scope { order(:position) }
@@ -55,6 +60,10 @@ class Book < ApplicationRecord
       Book.create!(user_id: user.id, name: 'Venda coberta', position: pos += 1)
       Book.create!(user_id: user.id, name: 'Long/short', position: pos += 1)
     end
+  end
+
+  def color
+    Book::COLORS[position.to_i % Book::COLORS.size]
   end
 
   private

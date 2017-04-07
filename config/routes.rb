@@ -19,4 +19,7 @@ Rails.application.routes.draw do
   resources :user_brokers, except: [:show]
 
   resources :transactions, except: [:show]
+
+  get 'holdings', to: 'holdings#index', as: :holdings
+  get 'holdings/calc', to: 'holdings#calc', as: :holdings_calc
 end

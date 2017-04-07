@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170206171211) do
+ActiveRecord::Schema.define(version: 20170406135713) do
 
   create_table "books", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name"
@@ -31,6 +31,25 @@ ActiveRecord::Schema.define(version: 20170206171211) do
     t.datetime "updated_at",                 null: false
     t.index ["cnpj"], name: "index_brokers_on_cnpj", unique: true, using: :btree
     t.index ["name"], name: "index_brokers_on_name", using: :btree
+  end
+
+  create_table "holdings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "user_id"
+    t.integer  "user_broker_id"
+    t.integer  "book_id"
+    t.string   "asset"
+    t.string   "asset_name"
+    t.string   "asset_identifier"
+    t.integer  "quantity"
+    t.decimal  "initial_price",     precision: 10, scale: 6
+    t.decimal  "current_price",     precision: 10, scale: 6
+    t.date     "last_operation_at"
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+    t.index ["book_id"], name: "index_holdings_on_book_id", using: :btree
+    t.index ["user_broker_id"], name: "index_holdings_on_user_broker_id", using: :btree
+    t.index ["user_id", "asset_identifier"], name: "index_holdings_on_user_id_and_asset_identifier", using: :btree
+    t.index ["user_id"], name: "index_holdings_on_user_id", using: :btree
   end
 
   create_table "transactions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -98,6 +117,9 @@ ActiveRecord::Schema.define(version: 20170206171211) do
   end
 
   add_foreign_key "books", "users"
+  add_foreign_key "holdings", "books"
+  add_foreign_key "holdings", "user_brokers"
+  add_foreign_key "holdings", "users"
   add_foreign_key "transactions", "books"
   add_foreign_key "transactions", "user_brokers"
   add_foreign_key "transactions", "users"

@@ -4,7 +4,8 @@ class TransactionsController < ApplicationController
 
   # GET /transactions
   def index
-    @transactions = current_user.transactions.includes(:user_broker, :book).all
+    @transactions = current_user.transactions.includes(:user_broker, :book).
+                    order('operation_at DESC, id DESC').all
   end
 
   # GET /transactions/new

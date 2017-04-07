@@ -1,0 +1,96 @@
+<% content_for :action_buttons do %>
+
+  <li class="breadcrumb-menu">
+    <div class="btn-group" role="group">
+      <% if current_user.calculating? %>
+        <button type="button" class="btn btn-success">Recalculando posições...</button>
+      <% else %>
+        <%= link_to holdings_calc_path, class: 'btn btn-secondary' do %>
+          <i class="fa fa-plus-circle"></i> &nbsp;Recalcular posições
+        <% end %>
+      <% end %>
+    </div>
+  </li>
+<% end %>
+
+<div class="card">
+  <div class="card-header">
+    Posições consolidadas
+  </div>
+  <div class="card-block">
+    <div class="row">
+      <div class="col-sm-6">
+        <table class="table table-striped table-hover table-sm">
+          <thead class="thead-inverse">
+            <tr>
+              <th>Classe de ativo</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% Transaction::ASSET.values.each do |asset| %>
+              <tr>
+                <td><%= I18n.t asset, scope: 'constants.asset' %></td>
+                <td><%= number_to_currency holdings_value_for_asset(asset) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>Total</td>
+              <td><%= number_to_currency holdings_value_for_asset('Total') %></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="card">
+  <div class="card-header">
+    Posições em ações
+  </div>
+  <div class="card-block">
+    <table class="table table-striped table-hover">
+      <thead class="thead-inverse">
+        <tr>
+          <th>Ativo</th>
+          <th>Qtd.</th>
+          <th>Preço<br>médio</th>
+          <th>Cotação</th>
+          <th>Valor<br>inicial</th>
+          <th>Valor<br>atual</th>
+          <th>Variação</th>
+          <th>Estratégia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @holdings.each do |holding| %>
+          <% next if holding.asset != Transaction::ASSET['stock'] %>
+          <tr>
+            <td>
+              <%= holding.asset_name %><br>
+              <small><%= holding.user_broker.name %></small>
+            </td>
+            <td><%= holding.quantity %></td>
+            <td><%= number_to_currency holding.initial_price %></td>
+            <td><%= number_to_currency holding.current_price %></td>
+            <td><%= number_to_currency holding.initial_value %></td>
+            <td><%= number_to_currency holding.current_value %></td>
+            <td>
+              <span class="colorize-number"><%= number_to_percentage holding.net_profit_percentage %></span>
+              <small><span class="colorize-number">(<%= number_to_currency holding.net_profit %>)</span></small>
+            </td>
+            <td>
+              <span class="tag" style="background-color: <%= holding.book.color %>;"><%= holding.book.name %></span>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+      </tfoot>
+    </table>
+  </div>
+</div>

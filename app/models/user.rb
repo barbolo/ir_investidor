@@ -11,7 +11,20 @@ class User < ApplicationRecord
     reject_if: lambda { |attributes| attributes['name'].blank? }
   has_many :user_brokers, dependent: :destroy
   has_many :transactions, dependent: :destroy
+  has_many :holdings, dependent: :destroy
 
   # Callbacks
   after_create { Book.initialize_books(self) }
+
+  def start_calculations_signal
+    Rails.cache.write("user/calculating/#{id}", true)
+  end
+
+  def stop_calculations_signal
+    Rails.cache.delete("user/calculating/#{id}")
+  end
+
+  def calculating?
+    Rails.cache.read("user/calculating/#{id}")
+  end
 end

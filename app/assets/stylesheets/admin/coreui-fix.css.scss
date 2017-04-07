@@ -23,3 +23,9 @@ body:not(.top-nav) .sidebar ul.nav li.nav-item a.nav-link.active i {
   text-decoration: underline;
   &:hover { color: #eef; }
 }
+
+table tfoot {
+  font-weight: 600;
+}
+
+.breadcrumb .breadcrumb-menu .btn-group button { margin-right: 17px; }

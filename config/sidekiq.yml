@@ -7,5 +7,7 @@ production:
 :queues:
   - default
   - database_changes
+  - calculating
 :limits:
   database_changes: 3
+  calculating: 1

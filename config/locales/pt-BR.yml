@@ -204,6 +204,7 @@ pt-BR:
       format:
         delimiter: "."
         format: "%n%"
+        precision: 2
     precision:
       format:
         delimiter: "."

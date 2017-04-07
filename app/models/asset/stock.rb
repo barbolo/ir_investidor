@@ -20,9 +20,9 @@ class Asset::Stock < Asset::Base
   def self.irrf(transaction)
     if transaction.inverse_holding.present?
       if transaction.daytrade?
-        (transaction.net_earnings * 0.00005).floor(2)
-      else
         (transaction.net_earnings * 0.01).floor(2)
+      else
+        (transaction.net_earnings * 0.00005).floor(2)
       end
     else
       0
@@ -38,6 +38,10 @@ class Asset::Stock < Asset::Base
   end
 
   def self.name(transaction)
+    transaction.ticker
+  end
+
+  def self.identifier(transaction)
     transaction.ticker
   end
 end
