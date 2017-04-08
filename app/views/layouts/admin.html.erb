@@ -43,7 +43,7 @@
         <ul class="nav">
           <li class="nav-title">Investimentos</li>
           <li class="nav-item">
-            <a class="nav-link" href="/todo"><i class="icon-wallet"></i> Minha carteira</a>
+            <%= menu_link_to '<i class="icon-wallet"></i> Minha carteira', 'portfolio', 'index', controller_name == 'portfolio' %>
           </li>
           <li class="nav-item">
             <%= menu_link_to '<i class="icon-chart"></i> Operações', 'transactions', 'index', controller_name == 'transactions' %>

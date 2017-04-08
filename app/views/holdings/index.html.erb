@@ -6,7 +6,7 @@
         <button type="button" class="btn btn-success">Recalculando posições...</button>
       <% else %>
         <%= link_to holdings_calc_path, class: 'btn btn-secondary' do %>
-          <i class="fa fa-plus-circle"></i> &nbsp;Recalcular posições
+          <i class="fa fa-refresh"></i> &nbsp;Recalcular posições
         <% end %>
       <% end %>
     </div>
@@ -67,8 +67,11 @@
         </tr>
       </thead>
       <tbody>
+        <% initial_value = current_value = 0 %>
         <% @holdings.each do |holding| %>
           <% next if holding.asset != Transaction::ASSET['stock'] %>
+          <% initial_value += holding.initial_value %>
+          <% current_value += holding.current_value %>
           <tr>
             <td>
               <%= holding.asset_name %><br>
@@ -90,6 +93,19 @@
         <% end %>
       </tbody>
       <tfoot>
+        <tr style="font-weight: 700; color: white;" class="bg-inverse">
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td><%= number_to_currency initial_value %></td>
+          <td><%= number_to_currency current_value %></td>
+          <td>
+            <span><%= number_to_percentage 100*(current_value/initial_value - 1) %></span>
+            <small><span>(<%= number_to_currency current_value - initial_value %>)</span></small>
+          </td>
+          <td></td>
+        </tr>
       </tfoot>
     </table>
   </div>

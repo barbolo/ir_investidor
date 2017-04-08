@@ -43,7 +43,9 @@ module ApplicationHelper
                               { content: 'Operações', href: URLS.transactions_path },
                               { content: 'Editar operação', active: true}],
     'holdings#index' => [{ content: 'Investimentos' },
-                         { content: 'Posições', active: true }]
+                         { content: 'Posições', active: true }],
+    'portfolio#index' => [{ content: 'Investimentos' },
+                          { content: 'Minha carteira', active: true }]
   }
 
   def app_version

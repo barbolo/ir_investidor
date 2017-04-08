@@ -26,6 +26,9 @@ Rails.application.routes.draw do
   get 'holdings', to: 'holdings#index', as: :holdings
   get 'holdings/calc', to: 'holdings#calc', as: :holdings_calc
 
+  get 'portfolio', to: 'portfolio#index', as: :portfolio
+  get 'portfolio/calc', to: 'portfolio#calc', as: :portfolio_calc
+
   # Sidekiq Web UI
   authenticate :user do
     mount Sidekiq::Web => '/sidekiq-admin'
