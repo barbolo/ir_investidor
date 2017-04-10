@@ -45,7 +45,9 @@ module ApplicationHelper
     'holdings#index' => [{ content: 'Investimentos' },
                          { content: 'Posições', active: true }],
     'portfolio#index' => [{ content: 'Investimentos' },
-                          { content: 'Minha carteira', active: true }]
+                          { content: 'Minha carteira', active: true }],
+    'tax#index' => [{ content: 'Investimentos' },
+                    { content: 'Impostos', active: true }],
   }
 
   def app_version

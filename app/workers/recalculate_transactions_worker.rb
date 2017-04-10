@@ -6,8 +6,10 @@ class RecalculateTransactionsWorker
 
     if !start_date
       user.holdings.destroy_all
+      user.taxes.destroy_all
       transactions = user.transactions
     else
+      user.taxes.where('period >= ?', start_date.beginning_of_month).destroy_all
       user.holdings.where('last_operation_at >= ?', start_date).destroy_all
       transactions = user.transactions.where('operation_at >= ?', start_date)
     end

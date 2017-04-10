@@ -12,6 +12,7 @@ class User < ApplicationRecord
   has_many :user_brokers, dependent: :destroy
   has_many :transactions, dependent: :destroy
   has_many :holdings, dependent: :destroy
+  has_many :taxes, dependent: :destroy
 
   # Callbacks
   after_create { Book.initialize_books(self) }
@@ -26,5 +27,21 @@ class User < ApplicationRecord
 
   def calculating?
     Rails.cache.read("user/calculating/#{id}")
+  end
+
+  def tax_for(date)
+    period = date.beginning_of_month
+    @tax_for ||= {}
+    @tax_for[date] ||= taxes.find_or_create_by!(period: period)
+  end
+
+  def taxes_by_year_and_month(from = Date.today - 6.years)
+    return @taxes_by_year_and_month if @taxes_by_year_and_month
+    @taxes_by_year_and_month = {}
+    taxes.where('period >= ?', from).each do |tax|
+      @taxes_by_year_and_month[tax.period.year] ||= {}
+      @taxes_by_year_and_month[tax.period.year][tax.period.month] ||= tax
+    end
+    @taxes_by_year_and_month
   end
 end

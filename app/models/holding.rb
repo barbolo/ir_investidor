@@ -59,10 +59,13 @@ class Holding < ApplicationRecord
 
       if qtd * transaction_quantity < 0
         # decrease our assets holding
-        # TODO: we are decreasing our holdings and should calculate taxes
+        holding ||= holdings.first
+
+        # Add tax entry
+        transaction.asset_class.add_tax_entry(transaction)
+
         decreased = []
         decrease = transaction_quantity.abs
-        holding ||= holdings.first
         while decrease > 0 && holding.present?
           decreased << holding.id
           decrease_step = [holding.quantity.abs, decrease].min

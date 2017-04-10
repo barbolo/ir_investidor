@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170406135713) do
+ActiveRecord::Schema.define(version: 20170410133434) do
 
   create_table "books", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name"
@@ -50,6 +50,40 @@ ActiveRecord::Schema.define(version: 20170406135713) do
     t.index ["user_broker_id"], name: "index_holdings_on_user_broker_id", using: :btree
     t.index ["user_id", "asset_identifier"], name: "index_holdings_on_user_id_and_asset_identifier", using: :btree
     t.index ["user_id"], name: "index_holdings_on_user_id", using: :btree
+  end
+
+  create_table "tax_entries", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "tax_id"
+    t.string   "asset"
+    t.string   "asset_name"
+    t.boolean  "daytrade"
+    t.decimal  "net_earning",   precision: 10, scale: 2, default: "0.0"
+    t.decimal  "aliquot",       precision: 3,  scale: 2, default: "0.0"
+    t.decimal  "tax_value",     precision: 8,  scale: 2, default: "0.0"
+    t.decimal  "irrf",          precision: 8,  scale: 2, default: "0.0"
+    t.date     "operation_at"
+    t.date     "settlement_at"
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.index ["tax_id", "operation_at"], name: "index_tax_entries_on_tax_id_and_operation_at", using: :btree
+    t.index ["tax_id"], name: "index_tax_entries_on_tax_id", using: :btree
+  end
+
+  create_table "taxes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "user_id"
+    t.date     "period"
+    t.decimal  "net_earnings",                   precision: 10, scale: 2, default: "0.0"
+    t.decimal  "net_earnings_day_trade",         precision: 10, scale: 2, default: "0.0"
+    t.decimal  "losses_accumulated",             precision: 10, scale: 2, default: "0.0"
+    t.decimal  "losses_accumulated_day_trade",   precision: 10, scale: 2, default: "0.0"
+    t.decimal  "irrf",                           precision: 8,  scale: 2, default: "0.0"
+    t.decimal  "irrf_accumulated_to_compensate", precision: 8,  scale: 2, default: "0.0"
+    t.decimal  "stock_sales",                    precision: 10, scale: 2, default: "0.0"
+    t.decimal  "darf",                           precision: 8,  scale: 2, default: "0.0"
+    t.datetime "created_at",                                                              null: false
+    t.datetime "updated_at",                                                              null: false
+    t.index ["user_id", "period"], name: "index_taxes_on_user_id_and_period", using: :btree
+    t.index ["user_id"], name: "index_taxes_on_user_id", using: :btree
   end
 
   create_table "transactions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -120,6 +154,8 @@ ActiveRecord::Schema.define(version: 20170406135713) do
   add_foreign_key "holdings", "books"
   add_foreign_key "holdings", "user_brokers"
   add_foreign_key "holdings", "users"
+  add_foreign_key "tax_entries", "taxes"
+  add_foreign_key "taxes", "users"
   add_foreign_key "transactions", "books"
   add_foreign_key "transactions", "user_brokers"
   add_foreign_key "transactions", "users"

@@ -57,14 +57,15 @@ class Transaction < ApplicationRecord
   end
 
   def daytrade?
-    inverse_holding.last_operation_at == operation_at
+    inverse_holding.try(:last_operation_at) == operation_at
   end
 
   def inverse_holding
     return @inverse_holding if @inverse_holding
     holding = Holding.holdings_for(self).first
-    if operation == Transaction::OPERATION['sell'] && holding.quantity > 0 ||
-       operation == Transaction::OPERATION['buy'] && holding.quantity < 0
+    if holding.present? &&
+       ((operation == Transaction::OPERATION['sell'] && holding.quantity > 0) ||
+        (operation == Transaction::OPERATION['buy'] && holding.quantity < 0))
       @inverse_holding = holding
     else
       @inverse_holding = nil
@@ -73,7 +74,7 @@ class Transaction < ApplicationRecord
 
   def net_earnings
     if inverse_holding
-      quantity * (price - inverse_holding.initial_price)
+      quantity * (price_considering_costs - inverse_holding.initial_price)
     else
       0
     end
