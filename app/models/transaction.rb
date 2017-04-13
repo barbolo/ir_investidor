@@ -40,44 +40,11 @@ class Transaction < ApplicationRecord
   after_initialize :default_values
   before_validation :default_values
   after_create :process
-  after_update { Transaction.process_all(user) }
-  after_destroy { Transaction.process_all(user) }
-
-  def self.process_all(user)
-    user.start_calculations_signal
-    RecalculateTransactionsWorker.perform_async(user)
-  end
-
-  def process
-    Holding.process(self)
-  end
+  after_update { user.recalculate! }
+  after_destroy { user.recalculate! }
 
   def operation_defined?
     asset.present? && operation.present?
-  end
-
-  def daytrade?
-    inverse_holding.try(:last_operation_at) == operation_at
-  end
-
-  def inverse_holding
-    return @inverse_holding if @inverse_holding
-    holding = Holding.holdings_for(self).first
-    if holding.present? &&
-       ((operation == Transaction::OPERATION['sell'] && holding.quantity > 0) ||
-        (operation == Transaction::OPERATION['buy'] && holding.quantity < 0))
-      @inverse_holding = holding
-    else
-      @inverse_holding = nil
-    end
-  end
-
-  def net_earnings
-    if inverse_holding
-      quantity * (price_considering_costs - inverse_holding.initial_price)
-    else
-      0
-    end
   end
 
   def asset_class
@@ -104,7 +71,58 @@ class Transaction < ApplicationRecord
   end
 
   def price_considering_costs
-    (costs + quantity * price) / quantity
+    case operation
+    when Transaction::OPERATION['buy']
+      (quantity * price + costs) / quantity
+    when Transaction::OPERATION['sell']
+      (quantity * price - costs) / quantity
+    else
+      price
+    end
+  end
+
+  def quantity_with_sign
+    (operation == Transaction::OPERATION['sell']) ? (- quantity) : quantity
+  end
+
+  # An inverse holding is an asset in the porfolio that will be decreased with
+  # this transaction. For example, if the portfolio has 100 shares of XYZ and
+  # this transaction sells 100 shares of XYZ, then there's an inverse holding of
+  # 100 shares.
+  def inverse_holding
+    return @inverse_holding if @calculated_inverse_holding
+    @calculated_inverse_holding = true
+    holding = Holding.holdings_for(self).first
+    if holding.present? &&
+       ((operation == Transaction::OPERATION['sell'] && holding.quantity > 0) ||
+        (operation == Transaction::OPERATION['buy'] && holding.quantity < 0))
+      @inverse_holding = holding
+    else
+      @inverse_holding = nil
+    end
+  end
+
+  # TODO: in order to process day trade vs. normal trade, we need to create
+  # holdings for day trade operations that are converted to normal holdings
+  # when they are not considered day trade anymore.
+  def daytrade?
+    inverse_holding.try(:last_operation_at) == operation_at
+  end
+
+  def net_earnings
+    if inverse_holding
+      quantity * (price_considering_costs - inverse_holding.initial_price)
+    else
+      0
+    end
+  end
+
+  def process
+    if Holding.affect_current_holdings?(self)
+      user.recalculate!(operation_at.beginning_of_month)
+    else
+      asset_class.process(self)
+    end
   end
 
   private

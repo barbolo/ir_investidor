@@ -25,6 +25,13 @@ class User < ApplicationRecord
     Rails.cache.delete("user/calculating/#{id}")
   end
 
+  def recalculate!(start_date = nil)
+    if !calculating?
+      start_calculations_signal
+      RecalculateTransactionsWorker.perform_in(1.minute, id, start_date)
+    end
+  end
+
   def calculating?
     Rails.cache.read("user/calculating/#{id}")
   end

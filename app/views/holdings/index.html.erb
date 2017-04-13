@@ -1,18 +1,3 @@
-<% content_for :action_buttons do %>
-
-  <li class="breadcrumb-menu">
-    <div class="btn-group" role="group">
-      <% if current_user.calculating? %>
-        <button type="button" class="btn btn-success">Recalculando posições...</button>
-      <% else %>
-        <%= link_to holdings_calc_path, class: 'btn btn-secondary' do %>
-          <i class="fa fa-refresh"></i> &nbsp;Recalcular posições
-        <% end %>
-      <% end %>
-    </div>
-  </li>
-<% end %>
-
 <div class="card">
   <div class="card-header">
     Posições consolidadas
@@ -101,7 +86,7 @@
           <td><%= number_to_currency initial_value %></td>
           <td><%= number_to_currency current_value %></td>
           <td>
-            <span><%= number_to_percentage 100*(current_value/initial_value - 1) %></span>
+            <span><%= number_to_percentage(100*(current_value/initial_value - 1)) if initial_value > 0 %></span>
             <small><span>(<%= number_to_currency current_value - initial_value %>)</span></small>
           </td>
           <td></td>

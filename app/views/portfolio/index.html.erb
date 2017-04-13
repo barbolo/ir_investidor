@@ -1,18 +1,3 @@
-<% content_for :action_buttons do %>
-
-  <li class="breadcrumb-menu">
-    <div class="btn-group" role="group">
-      <% if current_user.calculating? %>
-        <button type="button" class="btn btn-success">Recalculando posições...</button>
-      <% else %>
-        <%= link_to portfolio_calc_path, class: 'btn btn-secondary' do %>
-          <i class="fa fa-refresh"></i> &nbsp;Recalcular posições
-        <% end %>
-      <% end %>
-    </div>
-  </li>
-<% end %>
-
 <div class="card">
   <div class="card-header">
     Minha carteira
@@ -66,7 +51,7 @@
                 <td><%= number_to_percentage(100*h.current_value/pv_child[1]) if pv_child[1] > 0 %></td>
                 <td><%= number_to_currency h.initial_value %></td>
                 <td><%= number_to_currency h.current_value %></td>
-                <td class="colorize-number"><%= number_to_percentage(100*(h.current_value/h.initial_value - 1)) if h.initial_value > 0 %></td>
+                <td class="colorize-number"><%= number_to_percentage(100*(h.current_value/h.initial_value - 1)) if h.initial_value != 0 %></td>
               </tr>
             <% end %>
 

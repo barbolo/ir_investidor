@@ -25,6 +25,7 @@ module PortfolioHelper
   end
 
   def holdings_for_book(book_id)
+    return [] if @holdings.blank?
     return (@holdings_for_book[book_id] || []) if @holdings_for_book.present?
     @holdings_for_book = {}
     @holdings.each do |h|

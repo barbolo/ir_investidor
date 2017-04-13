@@ -5,8 +5,8 @@ class PortfolioController < ApplicationController
                 order('asset_name ASC').all
   end
 
-  def calc
-    Transaction.process_all(current_user)
+  def recalc
+    current_user.recalculate!
     redirect_to portfolio_path
   end
 end

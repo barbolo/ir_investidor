@@ -36,5 +36,9 @@ end
 # Sidekiq-Cron
 schedule_file = "#{Rails.root}/config/schedule.yml"
 if File.exists?(schedule_file) && Sidekiq.server?
-  Sidekiq::Cron::Job.load_from_hash YAML.load_file(schedule_file)
+  begin
+    schedule = YAML.load_file(schedule_file)
+  rescue
+  end
+  Sidekiq::Cron::Job.load_from_hash(schedule) if schedule
 end

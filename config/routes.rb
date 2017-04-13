@@ -24,10 +24,9 @@ Rails.application.routes.draw do
   resources :transactions, except: [:show]
 
   get 'holdings', to: 'holdings#index', as: :holdings
-  get 'holdings/calc', to: 'holdings#calc', as: :holdings_calc
 
   get 'portfolio', to: 'portfolio#index', as: :portfolio
-  get 'portfolio/calc', to: 'portfolio#calc', as: :portfolio_calc
+  get 'portfolio/recalc', to: 'portfolio#recalc', as: :portfolio_recalc
 
   get 'tax', to: 'tax#index', as: :tax
 

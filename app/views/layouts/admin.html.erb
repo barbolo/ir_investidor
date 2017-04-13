@@ -35,6 +35,18 @@
         <a class="nav-link navbar-toggler layout-toggler" href="#">&#9776;</a>
       </li>
     </ul>
+
+    <ul class="nav navbar-nav pull-right hidden-md-down">
+      <li class="nav-item nav-item-recalc">
+        <% if current_user.calculating? %>
+          <button type="button" class="btn btn-danger" disabled><i class="fa fa-refresh fa-spin"></i> &nbsp;Recalcular posições</button>
+        <% else %>
+          <%= link_to portfolio_recalc_path, class: 'btn btn-outline-secondary' do %>
+            <i class="fa fa-refresh"></i> &nbsp;Recalcular posições
+          <% end %>
+        <% end %>
+      </li>
+    </ul>
   </header>
 
   <div class="app-body">
@@ -53,12 +65,6 @@
           </li>
           <li class="nav-item">
             <%= menu_link_to '<i class="icon-event"></i> DARF', 'tax', 'index', controller_name == 'tax' %>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/todo"><i class="icon-graph"></i> Relatórios</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/todo"><i class="icon-doc"></i> Documentos</a>
           </li>
           <li class="divider"></li>
           <li class="nav-title">Configurações</li>
