@@ -4,9 +4,10 @@ namespace :holdings do
   desc '[Temporary Task] Update prices of all holdings'
   task :update => :environment do
     stocks = []
-    Holding.select(:asset, :asset_name).group(:asset, :asset_name).each do |h|
-      if h.asset == Transaction::ASSET['stock']
-        stocks << h.asset_name.upcase.strip + '.SA'
+    holdings = Holding.group(:asset, :asset_name).pluck(:asset, :asset_name)
+    holdings.each do |asset, asset_name|
+      if asset == Transaction::ASSET['stock']
+        stocks << asset_name.upcase.strip + '.SA'
       end
     end
 

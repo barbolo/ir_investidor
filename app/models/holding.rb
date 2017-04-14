@@ -1,16 +1,17 @@
 class Holding < ApplicationRecord
-  belongs_to :user
-  belongs_to :user_broker
-  belongs_to :book
+  store :extra, accessors: [:user_brokers, :books], coder: YAML
 
-  def self.holdings_for(transaction)
-    args = {
-      user_id: transaction.user_id,
-      user_broker_id: transaction.user_broker_id,
-      asset: transaction.asset,
-      asset_identifier: transaction.asset_identifier
-    }
-    Holding.where(args).all
+  # Associations
+  belongs_to :user
+
+  # Callbacks
+  after_initialize :default_values
+  before_save :fix_values
+
+  def self.for(transaction)
+    Holding.where(user_id: transaction.user_id,
+                  asset: transaction.asset,
+                  asset_identifier: transaction.asset_identifier).first
   end
 
   def self.affect_current_holdings?(transaction)
@@ -36,4 +37,19 @@ class Holding < ApplicationRecord
   def net_profit_percentage
     100*(current_value/initial_value - 1)
   end
+
+  private
+    def default_values
+      self.user_brokers ||= {}
+      self.books        ||= {}
+    end
+
+    def fix_values
+      user_brokers.keys.each do |key|
+        self.user_brokers.delete(key) if user_brokers[key].to_i == 0
+      end
+      books.keys.each do |key|
+        self.books.delete(key) if books[key].to_i == 0
+      end
+    end
 end

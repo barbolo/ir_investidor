@@ -60,7 +60,12 @@
           <tr>
             <td>
               <%= holding.asset_name %><br>
-              <small><%= holding.user_broker.name %></small>
+              <%
+                holding.user_brokers.each do |user_broker_id, quantity|
+                  user_broker = user_broker_from_id(user_broker_id)
+              %>
+                <span class="tag tag-default"><%= user_broker.name %>: <%= number_to_human quantity %></span>
+              <% end %>
             </td>
             <td><%= holding.quantity %></td>
             <td><%= number_to_currency holding.initial_price %></td>
@@ -72,7 +77,12 @@
               <small><span class="colorize-number">(<%= number_to_currency holding.net_profit %>)</span></small>
             </td>
             <td>
-              <span class="tag" style="background-color: <%= holding.book.color %>;"><%= holding.book.name %></span>
+              <%
+                holding.books.each do |book_id, quantity|
+                  book = book_from_id(book_id)
+              %>
+                  <span class="tag" style="background-color: <%= book.color %>;"><%= book.name %>: <%= number_to_human quantity %></span>
+              <% end %>
             </td>
           </tr>
         <% end %>

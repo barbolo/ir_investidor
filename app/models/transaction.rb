@@ -92,7 +92,7 @@ class Transaction < ApplicationRecord
   def inverse_holding
     return @inverse_holding if @calculated_inverse_holding
     @calculated_inverse_holding = true
-    holding = Holding.holdings_for(self).first
+    holding = Holding.for(self)
     if holding.present? &&
        ((operation == Transaction::OPERATION['sell'] && holding.quantity > 0) ||
         (operation == Transaction::OPERATION['buy'] && holding.quantity < 0))
@@ -111,7 +111,8 @@ class Transaction < ApplicationRecord
 
   def net_earnings
     if inverse_holding
-      quantity * (price_considering_costs - inverse_holding.initial_price)
+      qtd = [quantity.abs, inverse_holding.quantity.abs].min
+      qtd * (price_considering_costs - inverse_holding.initial_price)
     else
       0
     end

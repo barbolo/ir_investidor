@@ -31,7 +31,6 @@ class Book < ApplicationRecord
            dependent: :destroy
   belongs_to :parent, class_name: 'Book', required: false
   has_many :transactions
-  has_many :holdings
 
   # Scopes
   default_scope { order(:position) }

@@ -18,11 +18,11 @@ class Asset::Stock < Asset::Base
   end
 
   def self.irrf(transaction)
-    if transaction.inverse_holding.present?
+    if (holding = transaction.inverse_holding).present?
       if transaction.daytrade?
-        (transaction.net_earnings * 0.01).floor(2)
+        (transaction.value * 0.01).floor(2)
       else
-        (transaction.net_earnings * 0.00005).floor(2)
+        (transaction.value * 0.00005).floor(2)
       end
     else
       0
@@ -48,90 +48,69 @@ class Asset::Stock < Asset::Base
   def self.process(transaction)
     Asset::Stock.tax_update_stock_sales(transaction)
 
-    holdings = Holding.holdings_for(transaction)
-    if holdings.blank?
+    qtd = transaction.quantity_with_sign
+
+    holding = Holding.for(transaction)
+    if holding.blank?
       # create a new holding
       holding = Holding.new
       holding.user_id           = transaction.user_id
-      holding.user_broker_id    = transaction.user_broker_id
-      holding.book_id           = transaction.book_id
       holding.asset             = transaction.asset
       holding.asset_identifier  = transaction.asset_identifier
       holding.asset_name        = transaction.asset_name
-      holding.quantity          = transaction.quantity_with_sign
       holding.initial_price     = transaction.price_considering_costs
       holding.current_price     = holding.initial_price
       holding.last_operation_at = transaction.operation_at
+      holding.user_brokers[transaction.user_broker_id] = qtd
+      holding.books[transaction.book_id]               = qtd
+      holding.quantity                                 = qtd
       holding.save!
 
-    else
-      # find quantity and average initial price of current holdings
-      qtd   = holdings.sum { |h| h.quantity }
-      price = holdings.sum { |h| h.quantity * h.initial_price } / qtd
-      transaction_quantity = transaction.quantity_with_sign
+    elsif qtd * holding.quantity < 0
+      # the transaction decreases the holding quantity
 
-      if qtd * transaction_quantity < 0 && qtd.abs < transaction_quantity.abs
-        # TODO: create a log inside the system to register this case.
-        # This should be processed like two operations: one do destroy the
-        # current holding and another to create a new inverse position.
-        fail("Invalid transaction: #{transaction.id}")
+      # Calculate taxes for the transaction
+      Asset::Stock.calculate_taxes(transaction)
+
+      if qtd.abs > holding.quantity.abs
+        # if changing vision about the asset (e.g. from short to long), the
+        # initial price is recalculated
+        holding.initial_price = transaction.price_considering_costs
+        holding.current_price = holding.initial_price
+        holding.user_brokers.clear # reset
+        holding.books.clear # reset
       end
 
-      # Try to find a holding with the same book of the transaction
-      holding = holdings.find { |h| h.book_id == transaction.book_id }
+      holding.last_operation_at = transaction.operation_at
+      holding.quantity += qtd
 
-      if qtd * transaction_quantity < 0
-        # decrease our assets holding
-        holding ||= holdings.first
-
-        # Add tax entry
-        Asset::Stock.add_tax_entry(transaction)
-
-        decreased = []
-        decrease = transaction.quantity
-        while decrease > 0 && holding.present?
-          decreased << holding.id
-          decrease_step = [holding.quantity.abs, decrease].min
-
-          if holding.quantity > 0
-            holding.quantity -= decrease_step
-          else
-            holding.quantity += decrease_step
-          end
-          holding.quantity == 0 ? holding.destroy : holding.save!
-
-          holding = holdings.find { |h| !h.id.in?(decreased) }
-          decrease -= decrease_step
-        end
-
+      if holding.quantity == 0
+        holding.destroy
       else
-        price = ((transaction.quantity * transaction.price_considering_costs) +
-               (qtd * price)) / (transaction.quantity + qtd)
-
-        # increase our assets holding
-        if holding.present?
-          holding.quantity += transaction_quantity
-          holding.quantity == 0 ? holding.destroy : holding.save!
-
-        else
-          # create a holding for a new book
-          holding = Holding.new
-          holding.user_id           = transaction.user_id
-          holding.user_broker_id    = transaction.user_broker_id
-          holding.book_id           = transaction.book_id
-          holding.asset             = transaction.asset
-          holding.asset_identifier  = transaction.asset_identifier
-          holding.asset_name        = transaction.asset_name
-          holding.quantity          = transaction_quantity
-          holding.initial_price     = price
-          holding.current_price     = holdings.first.current_price
-          holding.save!
-        end
-
-        puts 'AKSJKDJAKJSKJAKS'
-        Holding.where(id: holdings.map(&:id)).update_all(
-          initial_price: price, last_operation_at: transaction.operation_at)
+        holding.user_brokers[transaction.user_broker_id] ||= 0
+        holding.user_brokers[transaction.user_broker_id] += qtd
+        holding.books[transaction.book_id]               ||= 0
+        holding.books[transaction.book_id]               += qtd
+        holding.save!
       end
+
+      holding.quantity == 0 ? holding.destroy : holding.save!
+
+    else
+      # the transaction increases the holding quantity
+      price = ((qtd * transaction.price_considering_costs) +
+               (holding.quantity * holding.initial_price)) /
+              (qtd + holding.quantity)
+
+      holding.initial_price     = price
+      holding.current_price     = holding.initial_price
+      holding.last_operation_at = transaction.operation_at
+      holding.quantity          += qtd
+      holding.user_brokers[transaction.user_broker_id] ||= 0
+      holding.user_brokers[transaction.user_broker_id] += qtd
+      holding.books[transaction.book_id]               ||= 0
+      holding.books[transaction.book_id]               += qtd
+      holding.save!
     end
   end
 
@@ -143,7 +122,7 @@ class Asset::Stock < Asset::Base
     end
   end
 
-  def self.add_tax_entry(transaction)
+  def self.calculate_taxes(transaction)
     net_earnings = transaction.net_earnings
     daytrade = transaction.daytrade?
     irrf = transaction.irrf
