@@ -146,7 +146,6 @@ class Asset::Stock < Asset::Base
       tax_entry.irrf = irrf
     end
     tax_entry.operation_at = transaction.operation_at
-    tax_entry.settlement_at = transaction.settlement_at
     tax.save!
   end
 end

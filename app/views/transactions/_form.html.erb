@@ -45,6 +45,21 @@
         </div>
       </div>
 
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group">
+            <%= f.label :book_id %>
+            <%= f.select :book_id, books_options_for_user, {}, class: 'form-control' %>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+            <%= f.label :operation_at %>
+            <%= f.text_field :operation_at, class: 'form-control datepicker', placeholder: 'dd/mm/aaaa', value: transaction.operation_at.strftime('%d/%m/%Y') %>
+          </div>
+        </div>
+      </div>
+
       <% if operation_defined %>
         <%= render "transactions/forms/#{transaction.asset}_#{transaction.operation}", locals: {transaction: transaction, f: f} %>
       <% end %>

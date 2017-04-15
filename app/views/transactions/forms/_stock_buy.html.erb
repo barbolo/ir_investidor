@@ -1,10 +1,5 @@
 <% transaction = locals[:transaction]; f = locals[:f] %>
 
-<div class="form-group">
-  <%= f.label :book_id %>
-  <%= f.select :book_id, books_options_for_user, {}, class: 'form-control' %>
-</div>
-
 <div class="row">
   <div class="col-sm-3">
     <div class="form-group">
@@ -33,21 +28,6 @@
           <%= f.text_field :price, value: number_with_precision(transaction.price, precision: 2), class: 'form-control money brl' %>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-sm-6">
-    <div class="form-group">
-      <%= f.label :operation_at %>
-      <%= f.text_field :operation_at, class: 'form-control datepicker', placeholder: 'dd/mm/aaaa', value: transaction.operation_at.strftime('%d/%m/%Y') %>
-    </div>
-  </div>
-  <div class="col-sm-6">
-    <div class="form-group">
-      <%= f.label :settlement_at %>
-      <%= f.text_field :settlement_at, class: 'form-control datepicker', placeholder: 'dd/mm/aaaa', value: transaction.settlement_at.strftime('%d/%m/%Y') %>
-      <p class="help-block">Data em que o dinheiro efetivamente é debitado ou creditado em sua conta.</p>
     </div>
   </div>
 </div>

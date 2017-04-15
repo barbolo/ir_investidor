@@ -129,7 +129,6 @@ class Transaction < ApplicationRecord
   private
     def default_values
       self.operation_at ||= Date.today
-      self.settlement_at ||= operation_at + 3.days
       if quantity && price && quantity > 0 && price > 0
         self.value = quantity * price
       end

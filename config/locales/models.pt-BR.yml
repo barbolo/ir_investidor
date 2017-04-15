@@ -61,5 +61,4 @@ pt-BR:
         costs: custos
         irrf: imposto de renda retido na fonte
         operation_at: data da operação
-        settlement_at: data da liquidação
         expire_at: data de vencimento do título

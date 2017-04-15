@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170413234023) do
+ActiveRecord::Schema.define(version: 20170415000854) do
 
   create_table "books", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name"
@@ -54,14 +54,13 @@ ActiveRecord::Schema.define(version: 20170413234023) do
     t.string   "asset"
     t.string   "asset_name"
     t.boolean  "daytrade"
-    t.decimal  "net_earning",   precision: 10, scale: 2, default: "0.0"
-    t.decimal  "aliquot",       precision: 3,  scale: 2, default: "0.0"
-    t.decimal  "tax_value",     precision: 8,  scale: 2, default: "0.0"
-    t.decimal  "irrf",          precision: 8,  scale: 2, default: "0.0"
+    t.decimal  "net_earning",  precision: 10, scale: 2, default: "0.0"
+    t.decimal  "aliquot",      precision: 3,  scale: 2, default: "0.0"
+    t.decimal  "tax_value",    precision: 8,  scale: 2, default: "0.0"
+    t.decimal  "irrf",         precision: 8,  scale: 2, default: "0.0"
     t.date     "operation_at"
-    t.date     "settlement_at"
-    t.datetime "created_at",                                             null: false
-    t.datetime "updated_at",                                             null: false
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
     t.index ["tax_id", "operation_at"], name: "index_tax_entries_on_tax_id_and_operation_at", using: :btree
     t.index ["tax_id"], name: "index_tax_entries_on_tax_id", using: :btree
   end
@@ -101,7 +100,6 @@ ActiveRecord::Schema.define(version: 20170413234023) do
     t.decimal  "costs",                         precision: 8,  scale: 2
     t.decimal  "irrf",                          precision: 8,  scale: 2
     t.date     "operation_at"
-    t.date     "settlement_at"
     t.date     "expire_at"
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false

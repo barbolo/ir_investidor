@@ -59,11 +59,11 @@
         <tr>
           <th colspan="2">Ativo</th>
           <th>Ganho líquido</th>
+          <th>Day trade?</th>
           <th>Alíquota</th>
           <th>Imposto</th>
           <th>IRRF</th>
           <th>Data da operação</th>
-          <th>Data da liquidação</th>
         </tr>
       </thead>
       <tbody>
@@ -72,6 +72,7 @@
             <td><%= t entry.asset, scope: 'constants.asset' %></td>
             <td><%= entry.asset_name %></td>
             <td class="colorize-number"><%= number_to_currency entry.net_earning %></td>
+            <td><%= entry.daytrade? ? 'Sim' : 'Não' %></td>
             <td>
               <%= number_to_percentage 100 * entry.aliquot %>
               <% if entry.daytrade %>
@@ -87,7 +88,6 @@
             </td>
             <td><%= number_to_currency entry.irrf %></td>
             <td><%= l entry.operation_at %></td>
-            <td><%= l entry.settlement_at %></td>
           </tr>
         <% end %>
       </tbody>
@@ -96,9 +96,9 @@
           <td colspan="2"></td>
           <td><%= number_to_currency @tax.calculated_net_earnings + @tax.calculated_net_earnings_daytrade %></td>
           <td></td>
+          <td></td>
           <td><%= number_to_currency @tax.calculated_darf %></td>
           <td><%= number_to_currency @tax.calculated_irrf %></td>
-          <td></td>
           <td></td>
         </tr>
       </tfoot>
