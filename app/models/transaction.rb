@@ -39,7 +39,7 @@ class Transaction < ApplicationRecord
   # Callbacks
   after_initialize :default_values
   before_validation :default_values
-  after_create :process
+  after_create { process if !user.calculating? }
   after_update { user.recalculate! }
   after_destroy { user.recalculate! }
 

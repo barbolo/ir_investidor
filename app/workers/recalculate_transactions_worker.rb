@@ -3,6 +3,7 @@ class RecalculateTransactionsWorker
   sidekiq_options queue: 'calculating'
   def perform(user_id, start_date = nil)
     user = User.find(user_id)
+    user.start_calculations_signal # ensure signal was emitted
 
     if !start_date
       user.holdings.destroy_all

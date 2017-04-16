@@ -18,7 +18,7 @@ class Asset::Stock < Asset::Base
   end
 
   def self.irrf(transaction)
-    if (holding = transaction.inverse_holding).present?
+    if transaction.operation == Transaction::OPERATION['sell']
       if transaction.daytrade?
         (transaction.value * 0.01).floor(2)
       else
@@ -140,11 +140,9 @@ class Asset::Stock < Asset::Base
     tax_entry.daytrade = daytrade
     tax_entry.net_earning = net_earnings
     tax_entry.aliquot = aliquot
-    if net_earnings > 0
-      tax.irrf += irrf
-      tax_entry.tax_value = aliquot * net_earnings
-      tax_entry.irrf = irrf
-    end
+    tax.irrf += irrf
+    tax_entry.irrf = irrf
+    tax_entry.tax_value = aliquot * net_earnings if net_earnings > 0
     tax_entry.operation_at = transaction.operation_at
     tax.save!
   end
