@@ -20,5 +20,7 @@ class RecalculateTransactionsWorker
     end
 
     user.stop_calculations_signal
+
+    CalculateTaxesWorker.perform_async(user.id, start_date)
   end
 end
