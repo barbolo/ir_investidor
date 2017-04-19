@@ -15,7 +15,7 @@ class RecalculateTransactionsWorker
       transactions = user.transactions.where('operation_at >= ?', start_date)
     end
 
-    transactions.find_each do |tr|
+    transactions.order(:operation_at).each do |tr|
       tr.process
     end
 

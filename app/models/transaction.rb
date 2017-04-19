@@ -1,5 +1,6 @@
 class Transaction < ApplicationRecord
   serialize :costs_breakdown, JSON
+  store :extra, accessors: [:old_name, :new_name], coder: YAML
 
   ASSET = {
   # 'code_key'    => 'db_key' (max length: 5)
@@ -15,25 +16,34 @@ class Transaction < ApplicationRecord
   # 'code_key'    => 'db_key' (max length: 5)
     'buy'         => 'buy',
     'sell'        => 'sell',
+    'change_name' => 'cname',
   }
   OPERATION_REVERSED = Hash[ OPERATION.map { |k,v| [v,k] } ]
 
   # Associations
   belongs_to :user
   belongs_to :user_broker
-  belongs_to :book
+  belongs_to :book, optional: true
 
   # Validations
   validates :user, presence: true
   validates :user_broker, presence: true
-  validates :book, presence: true
   validates :asset, presence: true, inclusion: { in: ASSET.values }
   validates :operation, presence: true, inclusion: { in: OPERATION.values }
-  validates :quantity, numericality: { greater_than: 0, only_integer: true }
-  validates :price, numericality: { greater_than: 0 }
   validate :user_is_the_same
-  with_options if: 'asset == Transaction::ASSET["stock"]' do |stock|
-    stock.validates :ticker, presence: true
+  with_options if: :money_operation? do |tr|
+    tr.validates :book, presence: true
+    tr.validates :quantity, numericality: { greater_than: 0,
+                                            only_integer: true }
+    tr.validates :price, numericality: { greater_than: 0 }
+  end
+  with_options if: :has_ticker? do |tr|
+    tr.validates :ticker, presence: true
+  end
+  with_options if: 'operation == Transaction::ASSET["change_name"]' do |tr|
+    puts 'CATCHO'
+    tr.validates :old_name, presence: true
+    tr.validates :new_name, presence: true
   end
 
   # Callbacks
@@ -68,6 +78,14 @@ class Transaction < ApplicationRecord
 
   def asset_identifier
     asset_class.identifier(self)
+  end
+
+  def has_ticker?
+    asset == Transaction::ASSET["stock"] && money_operation?
+  end
+
+  def money_operation?
+    Transaction::OPERATION.slice('buy', 'sell').values.include? operation
   end
 
   def price_considering_costs
@@ -121,6 +139,8 @@ class Transaction < ApplicationRecord
   def process
     if Holding.affect_current_holdings?(self)
       user.recalculate!(operation_at.beginning_of_month)
+    elsif operation == Transaction::OPERATION['change_name']
+      process_change_name
     else
       asset_class.process(self)
     end
@@ -143,5 +163,15 @@ class Transaction < ApplicationRecord
     def user_is_the_same
       errors.add(:user_broker, :invalid) if user_broker.user_id != user_id
       errors.add(:book, :invalid) if book && (book.user_id != user_id)
+    end
+
+    def process_change_name
+      self.ticker = old_name
+      old_identifier = asset_identifier
+      self.ticker = new_name
+      new_identifier = asset_identifier
+      user.holdings.where(asset: asset, asset_identifier: old_identifier)
+                   .update_all(asset_identifier: new_identifier,
+                               asset_name: new_name )
     end
 end

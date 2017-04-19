@@ -32,14 +32,21 @@
         <tbody>
           <% @transactions.each do |transaction| %>
             <tr>
-              <td><%= transaction.book.name %></td>
+              <td><%= transaction.book.try(:name) %></td>
               <td><%= transaction.user_broker.name %></td>
               <td><%= transaction.operation_name %></td>
               <td><%= transaction.asset_class_name %></td>
-              <td><%= transaction.asset_name %></td>
-              <td><%= number_to_currency transaction.price %></td>
-              <td><%= transaction.quantity %></td>
-              <td><%= number_to_currency transaction.value %></td>
+              <% if transaction.operation == Transaction::OPERATION['change_name'] %>
+                <td colspan="4">
+                  <s><%= transaction.old_name %></s> > <strong><%= transaction.new_name %></strong>
+                </td>
+              <% else %>
+                <td><%= transaction.asset_name %></td>
+                <td><%= number_to_currency transaction.price %></td>
+                <td><%= transaction.quantity %></td>
+                <td><%= number_to_currency transaction.value %></td>
+              <% end %>
+
               <td><%= l transaction.operation_at %></td>
               <td>
                 <%= link_to edit_transaction_path(transaction), class: 'btn btn-sm btn-outline-primary' do %>

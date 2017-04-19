@@ -62,3 +62,5 @@ pt-BR:
         irrf: imposto de renda retido na fonte
         operation_at: data da operação
         expire_at: data de vencimento do título
+        old_name: Nome antigo
+        new_name: Nome novo

@@ -27,7 +27,7 @@ class TransactionsController < ApplicationController
     if params[:do_submit].present? && @transaction.save
       redirect_to edit_transaction_path(@transaction), notice: 'Operação criada com sucesso.'
     else
-      if transaction_params.has_key?(:price) && @transaction.valid?
+      if params[:full_form_ready].present? && @transaction.valid?
         @can_submit = true
       end
       render :new
@@ -64,7 +64,7 @@ class TransactionsController < ApplicationController
     def transaction_params
       t_params = params.fetch(:transaction).permit(:user_broker_id, :asset,
         :operation, :book_id, :ticker, :name, :quantity, :price, :operation_at,
-        :irrf, :costs_breakdown)
+        :irrf, :costs_breakdown, :old_name, :new_name)
       t_params = t_params.to_unsafe_h
 
       if (cb = params[:transaction][:costs_breakdown]).present?
