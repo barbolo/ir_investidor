@@ -2,6 +2,7 @@
 pt-BR:
   constants:
     asset:
+      option: Opção
       stock: Ação
 
     operation:

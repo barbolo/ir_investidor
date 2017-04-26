@@ -5,11 +5,13 @@ class Transaction < ApplicationRecord
   ASSET = {
   # 'code_key'    => 'db_key' (max length: 5)
     'stock'       => 'stock',
+    'option'      => 'opt',
   }
   ASSET_REVERSED = Hash[ ASSET.map { |k,v| [v,k] } ]
 
   ASSET_CLASS = {
     'stock'       => Asset::Stock,
+    'option'      => Asset::Option,
   }
 
   OPERATION = {
@@ -82,7 +84,8 @@ class Transaction < ApplicationRecord
   end
 
   def has_ticker?
-    asset == Transaction::ASSET["stock"] && money_operation?
+    Transaction::ASSET.slice('stock', 'option').values.include?(asset) &&
+      money_operation?
   end
 
   def money_operation?

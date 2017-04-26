@@ -10,8 +10,8 @@ Física) a calcular Imposto de Renda com aplicações de renda fixa e variável.
 |Investimento          |Suportado|
 |----------------------|---------|
 |Ação - Normal         |&#10004; |
-|Ação - Daytrade       |         |
-|Opção                 |         |
+|Ação - Daytrade       | Ainda não está testado |
+|Opção                 | Ainda não suporta exercício de opção |
 |Fundo de Investimento |         |
 |Fundo Imobiliário     |         |
 |Futuro                |         |
