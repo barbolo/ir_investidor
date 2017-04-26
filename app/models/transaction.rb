@@ -35,13 +35,12 @@ class Transaction < ApplicationRecord
     tr.validates :book, presence: true
     tr.validates :quantity, numericality: { greater_than: 0,
                                             only_integer: true }
-    tr.validates :price, numericality: { greater_than: 0 }
+    tr.validates :price, numericality: { greater_than_or_equal_to: 0 }
   end
   with_options if: :has_ticker? do |tr|
     tr.validates :ticker, presence: true
   end
   with_options if: 'operation == Transaction::ASSET["change_name"]' do |tr|
-    puts 'CATCHO'
     tr.validates :old_name, presence: true
     tr.validates :new_name, presence: true
   end
@@ -58,13 +57,15 @@ class Transaction < ApplicationRecord
   end
 
   def asset_class
-    ac = ASSET_CLASS[asset]
+    code = Transaction::ASSET_REVERSED[asset]
+    ac = ASSET_CLASS[code]
     fail("Invalid Asset Class for asset #{asset.inspect}") if ac.nil?
     ac
   end
 
   def asset_class_name
-    I18n.t asset, scope: 'constants.asset'
+    code = Transaction::ASSET_REVERSED[asset]
+    I18n.t code, scope: 'constants.asset'
   end
 
   def operation_name
@@ -149,7 +150,7 @@ class Transaction < ApplicationRecord
   private
     def default_values
       self.operation_at ||= Date.today
-      if quantity && price && quantity > 0 && price > 0
+      if quantity && price
         self.value = quantity * price
       end
       if asset && value

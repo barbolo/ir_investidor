@@ -10,12 +10,28 @@ class Tax < ApplicationRecord
     calculated_values[:net_earnings_daytrade]
   end
 
+  def calculated_taxes_stocks
+    calculated_values[:taxes_stocks]
+  end
+
   def calculated_darf
     calculated_values[:darf]
   end
 
   def calculated_irrf
     calculated_values[:irrf]
+  end
+
+  def calculated_irrf_compensated
+    calculated_values[:irrf_compensated]
+  end
+
+  def calculated_aliquots_values
+    calculated_values[:aliquots_values]
+  end
+
+  def calculated_aliquots_losses
+    calculated_values[:aliquots_losses]
   end
 
   def stocks_tax_free?
@@ -31,8 +47,10 @@ class Tax < ApplicationRecord
       @calculated_values[:taxes_stocks] = 0
       @calculated_values[:darf] = 0
       @calculated_values[:irrf] = 0
+      @calculated_values[:irrf_compensated] = 0
+      @calculated_values[:aliquots_values] = {}
+      @calculated_values[:aliquots_losses] = {}
 
-      aliquots_values = {}
       tax_entries.each do |entry|
         if entry.daytrade
           @calculated_values[:net_earnings_daytrade] += entry.net_earning
@@ -46,22 +64,28 @@ class Tax < ApplicationRecord
 
         @calculated_values[:irrf] += entry.irrf
 
-        aliquots_values[entry.aliquot] ||= 0
-        aliquots_values[entry.aliquot] += entry.net_earning
+        @calculated_values[:aliquots_values][entry.aliquot] ||= 0
+        @calculated_values[:aliquots_values][entry.aliquot] += entry.net_earning
       end
 
-      aliquots_values.each do |aliquot, net_earnings|
-        if net_earnings > 0
-          @calculated_values[:darf] += aliquot * net_earnings
-        end
+      @calculated_values[:aliquots_losses][BigDecimal.new('0.15')] = losses_accumulated
+      @calculated_values[:aliquots_losses][BigDecimal.new('0.20')] = losses_accumulated_day_trade
+
+      @calculated_values[:aliquots_values].each do |aliquot, net_earnings|
+        losses = @calculated_values[:aliquots_losses][aliquot] || 0
+        earnings = [net_earnings - losses, 0].max
+        @calculated_values[:darf] += aliquot * earnings
       end
 
       if stocks_tax_free?
         @calculated_values[:darf] -= @calculated_values[:taxes_stocks]
       end
 
-      @calculated_values[:darf] -= @calculated_values[:irrf]
-      @calculated_values[:darf] -= irrf_accumulated_to_compensate
+      irrf_sum = irrf_accumulated_to_compensate + @calculated_values[:irrf]
+      irrf_compensated = [@calculated_values[:darf], irrf_sum].min
+      irrf_compensated = 0 if irrf_compensated < 0
+      @calculated_values[:irrf_compensated] = irrf_compensated
+      @calculated_values[:darf] -= irrf_compensated
 
       @calculated_values[:darf] = 0 if @calculated_values[:darf] < 0
 

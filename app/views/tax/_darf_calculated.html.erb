@@ -1,0 +1,148 @@
+<% tax = locals[:tax]; date = locals[:date] %>
+
+<div class="card">
+  <div class="card-header">
+    Entenda como o DARF foi calculado
+  </div>
+  <div class="card-block">
+    <div id="darf-calculated" class="row">
+      <div class="col-sm-8">
+        <h4><%= l date, format: :month %></h4>
+        <br>
+        <table class="table table-calc table-hover table-sm">
+          <thead>
+            <tr>
+              <th colspan="2">1. Cálculo de ganhos líquidos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%
+              darf = 0
+              (tax.calculated_aliquots_values || {}).each do |aliquot, net_earnings|
+                losses = tax.calculated_aliquots_losses[aliquot] || 0
+                earnings = [net_earnings - losses, 0].max
+                taxes = aliquot * earnings
+                darf += taxes
+            %>
+              <tr>
+                <td>Ganhos líquidos com operações <%= aliquot_label(aliquot) %>:</td>
+                <td><%= number_to_currency net_earnings %></td>
+              </tr>
+              <tr>
+                <td>Compensação de prejuízos acumulados com operações <%= aliquot_label(aliquot) %>:</td>
+                <td><%= number_to_currency losses %></td>
+              </tr>
+              <tr>
+                <td>
+                  Subtotal de imposto com operações <%= aliquot_label(aliquot) %>:
+                  <br>
+                  (<%= number_to_currency earnings %> &times; <%= number_to_percentage 100 * aliquot %>)
+                </td>
+                <td><%= number_to_currency taxes %></td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>Imposto calculado:</td>
+              <td><%= number_to_currency(darf > 0 ? darf : 0) %></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <table class="table table-calc table-hover table-sm">
+          <thead>
+            <tr>
+              <th colspan="2">2. Isenções a descontar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <% if tax.stock_sales == 0 %>
+                <td>Sem vendas de ações no mês. Nada a descontar.</td>
+                <td></td>
+              <% elsif !tax.stocks_tax_free? %>
+                <td>Sem isenção para ganhos com ações (vendas maior que R$ 20.000,00)</td>
+                <td></td>
+              <% else %>
+                <% darf -= tax.calculated_taxes_stocks %>
+                <td>
+                  Vendas de ações no mês: <%= number_to_currency tax.stock_sales %>.
+                  Portanto, ganhos com ações isentos de imposto (valor inferior a R$ 20.000,00).
+                  Ganhos líquidos com ações: <%= number_to_currency tax.calculated_taxes_stocks/0.15 %>.
+                  Desconto no DARF:
+                  </td>
+                <td><%= number_to_currency tax.calculated_taxes_stocks %></td>
+              <% end %>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>Imposto calculado:</td>
+              <td><%= number_to_currency(darf > 0 ? darf : 0) %></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <table class="table table-calc table-hover table-sm">
+          <thead>
+            <tr>
+              <th colspan="2">3. IRRF a descontar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <% if tax.irrf_accumulated_to_compensate > 0 %>
+                <td>IRRF acumulado de meses anteriores:</td>
+                <td><%= number_to_currency tax.irrf_accumulated_to_compensate %></td>
+              <% else %>
+                <td>Sem IRRF acumulado de meses anteriores</td>
+                <td></td>
+              <% end %>
+            </tr>
+            <tr>
+              <% if tax.calculated_irrf > 0 %>
+                <td>IRRF no mês:</td>
+                <td><%= number_to_currency tax.calculated_irrf %></td>
+              <% else %>
+                <td>Sem IRRF no mês</td>
+                <td></td>
+              <% end %>
+            </tr>
+            <tr>
+              <td>IRRF compensado no DARF:</td>
+              <td><%= number_to_currency tax.calculated_irrf_compensated %></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <%
+                irrf_sum = tax.irrf_accumulated_to_compensate + tax.calculated_irrf
+                irrf_compensated = [darf, irrf_sum].min
+                darf -= irrf_compensated
+              %>
+              <td>Imposto calculado:</td>
+              <td><%= number_to_currency(darf > 0 ? darf : 0) %></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <table class="table table-calc table-hover table-sm">
+          <thead>
+            <tr>
+              <th colspan="2">4. DARF a pagar</th>
+            </tr>
+          </thead>
+          <tfoot>
+            <tr>
+              <td>Imposto calculado:</td>
+              <td><%= number_to_currency(darf > 0 ? darf : 0) %></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-secondary" onclick="printElement('#darf-calculated');"><i class="fa fa-print"></i>&nbsp; Imprimir</button>
+  </div>
+</div>

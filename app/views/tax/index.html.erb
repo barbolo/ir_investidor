@@ -45,8 +45,12 @@
           <td><%= number_to_currency @tax.losses_accumulated_day_trade %></td>
         </tr>
         <tr>
-          <th>IRRF a compensar:</th>
-          <td><%= number_to_currency @tax.irrf_accumulated_to_compensate + @tax.calculated_irrf %></td>
+          <th>IRRF acumulado de meses anteriores:</th>
+          <td><%= number_to_currency @tax.irrf_accumulated_to_compensate %></td>
+        </tr>
+        <tr>
+          <th>IRRF no mês:</th>
+          <td><%= number_to_currency @tax.calculated_irrf %></td>
         </tr>
       </tbody>
     </table>
@@ -69,7 +73,7 @@
       <tbody>
         <% @tax.tax_entries.each do |entry| %>
           <tr>
-            <td><%= t entry.asset, scope: 'constants.asset' %></td>
+            <td><%= entry.asset_class_name %></td>
             <td><%= entry.asset_name %></td>
             <td class="colorize-number"><%= number_to_currency entry.net_earning %></td>
             <td><%= entry.daytrade? ? 'Sim' : 'Não' %></td>
@@ -97,14 +101,16 @@
           <td><%= number_to_currency @tax.calculated_net_earnings + @tax.calculated_net_earnings_daytrade %></td>
           <td></td>
           <td></td>
-          <td><%= number_to_currency @tax.calculated_darf %></td>
-          <td><%= number_to_currency @tax.calculated_irrf %></td>
+          <td></td>
+          <td></td>
           <td></td>
         </tr>
       </tfoot>
     </table>
   </div>
 </div>
+
+<%= render 'darf_calculated', locals: { tax: @tax, date: @date } %>
 
 <div class="card">
   <div class="card-header">
@@ -143,4 +149,3 @@
     </table>
   </div>
 </div>
-
