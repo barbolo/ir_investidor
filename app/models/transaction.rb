@@ -128,7 +128,25 @@ class Transaction < ApplicationRecord
   # holdings for day trade operations that are converted to normal holdings
   # when they are not considered day trade anymore.
   def daytrade?
-    inverse_holding.try(:last_operation_at) == operation_at
+    expr = inverse_holding.try(:last_operation_at) == operation_at
+    if expr && (op = inverse_operation)
+      expr &&= user.transactions.where(
+        operation_at: operation_at,
+        operation: op,
+        asset: asset,
+        ticker: ticker
+      ).exists?
+    else
+      expr
+    end
+  end
+
+  def inverse_operation
+    if operation == Transaction::OPERATION['sell']
+      Transaction::OPERATION['buy']
+    elsif operation == Transaction::OPERATION['buy']
+      Transaction::OPERATION['sell']
+    end
   end
 
   def net_earnings
