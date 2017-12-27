@@ -1,22 +1,45 @@
 require 'csv'
 
+AJAX_HEADERS = { 'X-Requested-With' => 'XMLHttpRequest' }
+def get_prices_from_itau(ativo)
+  agent = Mechanize.new
+  args = { 'term' => ativo }
+  agent.get 'https://www.itaucorretora.com.br/cotacao/retornarpapeis/', args, nil, AJAX_HEADERS
+
+  args = {
+    'ativo'           => ativo,
+    'stocksToCompare' => '',
+    'currentOffers'   => '1',
+    'prevStock'       => ''
+  }
+  agent.get 'https://www.itaucorretora.com.br/finder/resultadobusca', args, nil, AJAX_HEADERS
+
+  if agent.page.body.match(/N.+o foram encontrados ativos para sua busca/)
+    # it's probably an expired option
+    price = '0.00'
+
+  else
+    price = agent.page.parser.css('#stock-integer .secao.preco strong').text
+    price = price.strip.gsub('.', '').gsub(',', '.').gsub(/[^0-9.]/, '')
+  end
+
+  agent.shutdown
+
+  price
+end
+
 def update_stocks(stocks)
   puts "Updating #{stocks.size} stocks..."
-  args = {
-    's' => stocks.map { |s| s + '.SA' }.join(' '),
-    'f' => 'sl1'
-  }
-  agent = Mechanize.new
-  agent.get('http://finance.yahoo.com/d/quotes.csv', args)
-  CSV.parse(agent.page.body).each do |row|
-    symbol, price = row
-    symbol = symbol.gsub(/\.SA\Z/, '')
-    puts "#{symbol}: #{price}"
+
+  stocks.each do |stock|
+    price = get_prices_from_itau(stock)
+
+    puts "#{stock}: #{price}"
+
     Holding.where(asset: Transaction::ASSET['stock'])
-           .where(asset_name: symbol)
+           .where(asset_name: stock)
            .update_all(current_price: BigDecimal.new(price))
   end
-  agent.shutdown
 
   puts "Stocks updated"
 end
@@ -24,33 +47,8 @@ end
 def update_options(options)
   puts "Updating #{options.size} options..."
 
-  headers = { 'X-Requested-With' => 'XMLHttpRequest' }
-
   options.each do |option|
-
-    agent = Mechanize.new
-
-    args = { 'term' => option }
-    agent.get 'https://www.itaucorretora.com.br/cotacao/retornarpapeis/', args, nil, headers
-
-    args = {
-      'ativo'           => option,
-      'stocksToCompare' => '',
-      'currentOffers'   => '1',
-      'prevStock'       => ''
-    }
-    agent.get 'https://www.itaucorretora.com.br/finder/resultadobusca', args, nil, headers
-
-    if agent.page.body.match(/N.+o foram encontrados ativos para sua busca/)
-      # it's probably an expired option
-      price = '0.00'
-
-    else
-      price = agent.page.parser.css('#stock-integer .secao.preco strong').text
-      price = price.strip.gsub('.', '').gsub(',', '.').gsub(/[^0-9.]/, '')
-    end
-
-    agent.shutdown
+    price = get_prices_from_itau(option)
 
     puts "#{option}: #{price}"
 
