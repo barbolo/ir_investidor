@@ -77,6 +77,10 @@ class Tax < ApplicationRecord
         @calculated_values[:darf] += aliquot * earnings
       end
 
+      if @calculated_values[:taxes_stocks] < 0
+        @calculated_values[:taxes_stocks] = 0
+      end
+
       if stocks_tax_free?
         @calculated_values[:darf] -= @calculated_values[:taxes_stocks]
       end
