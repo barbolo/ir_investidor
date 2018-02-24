@@ -60,6 +60,22 @@ def update_options(options)
   puts "Options updated"
 end
 
+def update_fiis(fiis)
+  puts "Updating #{fiis.size} fiis..."
+
+  fiis.each do |fii|
+    price = get_prices_from_itau(fii)
+
+    puts "#{fii}: #{price}"
+
+    Holding.where(asset: Transaction::ASSET['fii'])
+           .where(asset_name: fii)
+           .update_all(current_price: BigDecimal.new(price))
+  end
+
+  puts "Fiis updated"
+end
+
 namespace :holdings do
   desc '[Temporary Task] Update prices of all holdings'
   task :update => :environment do
@@ -76,6 +92,7 @@ namespace :holdings do
     threads = []
     threads << Thread.new { update_stocks(holdings[Transaction::ASSET['stock']]) }
     threads << Thread.new { update_options(holdings[Transaction::ASSET['option']]) }
+    threads << Thread.new { update_fiis(holdings[Transaction::ASSET['fii']]) }
     threads.each &:join
   end
 end

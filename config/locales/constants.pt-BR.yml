@@ -4,6 +4,7 @@ pt-BR:
     asset:
       option: Opção
       stock: Ação
+      fii: Fundo Imobiliário
 
     operation:
       buy: Compra

@@ -19,11 +19,15 @@
           <td><%= l @date.next_month.end_of_month %></td>
         </tr>
         <tr>
-          <th>Ganho líquido:</th><td class="colorize-number"><%= number_to_currency @tax.calculated_net_earnings %></td>
+          <th>Ganho líquido em operações normais:</th><td class="colorize-number"><%= number_to_currency @tax.calculated_net_earnings[:non_daytrade] %></td>
         </tr>
         <tr>
-          <th>Ganho líquido (day trade):</th>
-          <td class="colorize-number"><%= number_to_currency @tax.calculated_net_earnings_daytrade %></td>
+          <th>Ganho líquido em operações day trade:</th>
+          <td class="colorize-number"><%= number_to_currency @tax.calculated_net_earnings[:daytrade] %></td>
+        </tr>
+        <tr>
+          <th>Ganho líquido em operações com fundos imobiliários:</th>
+          <td class="colorize-number"><%= number_to_currency @tax.calculated_net_earnings[:fii] %></td>
         </tr>
         <tr>
           <th>Vendas de ações:</th>
@@ -37,12 +41,16 @@
           </td>
         </tr>
         <tr>
-          <th>Prejuízos acumulados de meses anteriores:</th>
+          <th>Prejuízos acumulados de meses anteriores em operações normais:</th>
           <td><%= number_to_currency @tax.losses_accumulated %></td>
         </tr>
         <tr>
-          <th>Prejuízos acumulados de meses anteriores (day trade):</th>
+          <th>Prejuízos acumulados de meses anteriores em operações day trade:</th>
           <td><%= number_to_currency @tax.losses_accumulated_day_trade %></td>
+        </tr>
+        <tr>
+          <th>Prejuízos acumulados de meses anteriores em operações com fundos imobiliários:</th>
+          <td><%= number_to_currency @tax.losses_accumulated_fii %></td>
         </tr>
         <tr>
           <th>IRRF acumulado de meses anteriores:</th>
@@ -98,7 +106,7 @@
       <tfoot>
         <tr style="font-weight: 700; color: white;" class="bg-inverse">
           <td colspan="2"></td>
-          <td><%= number_to_currency @tax.calculated_net_earnings + @tax.calculated_net_earnings_daytrade %></td>
+          <td><%= number_to_currency @tax.calculated_net_earnings.values.sum %></td>
           <td></td>
           <td></td>
           <td></td>

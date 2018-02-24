@@ -6,12 +6,14 @@ class Transaction < ApplicationRecord
   # 'code_key'    => 'db_key' (max length: 5)
     'stock'       => 'stock',
     'option'      => 'opt',
+    'fii'         => 'fii',
   }
   ASSET_REVERSED = Hash[ ASSET.map { |k,v| [v,k] } ]
 
   ASSET_CLASS = {
     'stock'       => Asset::Stock,
     'option'      => Asset::Option,
+    'fii'         => Asset::Fii,
   }
 
   OPERATION = {

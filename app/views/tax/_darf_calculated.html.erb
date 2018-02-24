@@ -1,4 +1,5 @@
 <% tax = locals[:tax]; date = locals[:date] %>
+<% darf = 0 %>
 
 <div class="card">
   <div class="card-header">
@@ -12,51 +13,34 @@
         <table class="table table-calc table-hover table-sm">
           <thead>
             <tr>
-              <th colspan="2">1. Cálculo de ganhos líquidos</th>
+              <th colspan="2">1. Cálculo de ganhos líquidos em operações normais</th>
             </tr>
           </thead>
           <tbody>
-            <%
-              darf = 0
-              (tax.calculated_aliquots_values || {}).each do |aliquot, net_earnings|
-                losses = tax.calculated_aliquots_losses[aliquot] || 0
-                earnings = [net_earnings - losses, 0].max
-                taxes = aliquot * earnings
-                darf += taxes
+            <% # non daytrade
+              aliquot      = tax.calculated_aliquots[:non_daytrade] || 0
+              net_earnings = tax.calculated_net_earnings[:non_daytrade] || 0
+              losses       = tax.calculated_losses[:non_daytrade] || 0
+              earnings     = [net_earnings - losses, 0].max
+              taxes        = aliquot * earnings
+              darf += taxes
             %>
-              <tr>
-                <td>Ganhos líquidos com operações <%= aliquot_label(aliquot) %>:</td>
-                <td><%= number_to_currency net_earnings %></td>
-              </tr>
-              <tr>
-                <td>Compensação de prejuízos acumulados com operações <%= aliquot_label(aliquot) %>:</td>
-                <td><%= number_to_currency losses %></td>
-              </tr>
-              <tr>
-                <td>
-                  Subtotal de imposto com operações <%= aliquot_label(aliquot) %>:
-                  <br>
-                  (<%= number_to_currency earnings %> &times; <%= number_to_percentage 100 * aliquot %>)
-                </td>
-                <td><%= number_to_currency taxes %></td>
-              </tr>
-            <% end %>
-          </tbody>
-          <tfoot>
             <tr>
-              <td>Imposto calculado:</td>
-              <td><%= number_to_currency(darf > 0 ? darf : 0) %></td>
+              <td>Ganhos líquidos:</td>
+              <td><%= number_to_currency net_earnings %></td>
             </tr>
-          </tfoot>
-        </table>
-
-        <table class="table table-calc table-hover table-sm">
-          <thead>
             <tr>
-              <th colspan="2">2. Isenções a descontar</th>
+              <td>Compensação de prejuízos acumulados:</td>
+              <td><%= number_to_currency losses %></td>
             </tr>
-          </thead>
-          <tbody>
+            <tr>
+              <td>
+                Subtotal de imposto:
+                <br>
+                (<%= number_to_currency earnings %> &times; <%= number_to_percentage 100 * aliquot %>)
+              </td>
+              <td><%= number_to_currency taxes %></td>
+            </tr>
             <tr>
               <% if tax.stock_sales == 0 %>
                 <td>Sem vendas de ações no mês. Nada a descontar.</td>
@@ -65,12 +49,15 @@
                 <td>Sem isenção para ganhos com ações (vendas maior que R$ 20.000,00)</td>
                 <td></td>
               <% else %>
-                <% darf -= tax.calculated_taxes_stocks %>
+                <%
+                  darf -= tax.calculated_taxes_stocks
+                  darf = [darf, 0].max
+                %>
                 <td>
                   Vendas de ações no mês: <%= number_to_currency tax.stock_sales %>.
                   Portanto, ganhos com ações isentos de imposto (valor inferior a R$ 20.000,00).
                   Ganhos líquidos com ações: <%= number_to_currency tax.calculated_taxes_stocks/0.15 %>.
-                  Desconto no DARF:
+                  Desconto de imposto em operações normais:
                   </td>
                 <td><%= number_to_currency tax.calculated_taxes_stocks %></td>
               <% end %>
@@ -87,7 +74,87 @@
         <table class="table table-calc table-hover table-sm">
           <thead>
             <tr>
-              <th colspan="2">3. IRRF a descontar</th>
+              <th colspan="2">2. Cálculo de ganhos líquidos em operações day trade</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% # daytrade
+              aliquot      = tax.calculated_aliquots[:daytrade] || 0
+              net_earnings = tax.calculated_net_earnings[:daytrade] || 0
+              losses       = tax.calculated_losses[:daytrade] || 0
+              earnings     = [net_earnings - losses, 0].max
+              taxes        = aliquot * earnings
+              darf += taxes
+            %>
+            <tr>
+              <td>Ganhos líquidos:</td>
+              <td><%= number_to_currency net_earnings %></td>
+            </tr>
+            <tr>
+              <td>Compensação de prejuízos acumulados:</td>
+              <td><%= number_to_currency losses %></td>
+            </tr>
+            <tr>
+              <td>
+                Subtotal de imposto:
+                <br>
+                (<%= number_to_currency earnings %> &times; <%= number_to_percentage 100 * aliquot %>)
+              </td>
+              <td><%= number_to_currency taxes %></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>Imposto calculado:</td>
+              <td><%= number_to_currency(darf > 0 ? darf : 0) %></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <table class="table table-calc table-hover table-sm">
+          <thead>
+            <tr>
+              <th colspan="2">3. Cálculo de ganhos líquidos em operações com fundos imobiliários</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% # fii
+              aliquot      = tax.calculated_aliquots[:fii] || 0
+              net_earnings = tax.calculated_net_earnings[:fii] || 0
+              losses       = tax.calculated_losses[:fii] || 0
+              earnings     = [net_earnings - losses, 0].max
+              taxes        = aliquot * earnings
+              darf += taxes
+            %>
+            <tr>
+              <td>Ganhos líquidos:</td>
+              <td><%= number_to_currency net_earnings %></td>
+            </tr>
+            <tr>
+              <td>Compensação de prejuízos acumulados:</td>
+              <td><%= number_to_currency losses %></td>
+            </tr>
+            <tr>
+              <td>
+                Subtotal de imposto:
+                <br>
+                (<%= number_to_currency earnings %> &times; <%= number_to_percentage 100 * aliquot %>)
+              </td>
+              <td><%= number_to_currency taxes %></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>Imposto calculado:</td>
+              <td><%= number_to_currency(darf > 0 ? darf : 0) %></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <table class="table table-calc table-hover table-sm">
+          <thead>
+            <tr>
+              <th colspan="2">4. IRRF a descontar</th>
             </tr>
           </thead>
           <tbody>
@@ -130,7 +197,7 @@
         <table class="table table-calc table-hover table-sm">
           <thead>
             <tr>
-              <th colspan="2">4. DARF a pagar</th>
+              <th colspan="2">5. DARF a pagar</th>
             </tr>
           </thead>
           <tfoot>

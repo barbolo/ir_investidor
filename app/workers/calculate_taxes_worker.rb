@@ -38,17 +38,21 @@ class CalculateTaxesWorker
         losses_accumulated = 0 if losses_accumulated < 0
         losses_accumulated_day_trade = previous_tax.losses_accumulated_day_trade - previous_tax.net_earnings_day_trade
         losses_accumulated_day_trade = 0 if losses_accumulated_day_trade < 0
+        losses_accumulated_fii = previous_tax.losses_accumulated_fii - previous_tax.net_earnings_fii
+        losses_accumulated_fii = 0 if losses_accumulated_fii < 0
 
         irrf_accumulated_to_compensate = previous_tax.irrf + previous_tax.irrf_accumulated_to_compensate
         irrf_accumulated_to_compensate -= previous_tax.calculated_irrf_compensated
 
         tax.losses_accumulated = losses_accumulated
         tax.losses_accumulated_day_trade = losses_accumulated_day_trade
+        tax.losses_accumulated_fii = losses_accumulated_fii
         tax.irrf_accumulated_to_compensate = irrf_accumulated_to_compensate
       end
 
-      tax.net_earnings = tax.calculated_net_earnings
-      tax.net_earnings_day_trade = tax.calculated_net_earnings_daytrade
+      tax.net_earnings = tax.calculated_net_earnings[:non_daytrade]
+      tax.net_earnings_day_trade = tax.calculated_net_earnings[:daytrade]
+      tax.net_earnings_fii = tax.calculated_net_earnings[:fii]
       tax.irrf = tax.calculated_irrf
 
       tax.stock_sales = user.transactions
