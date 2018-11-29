@@ -1,7 +1,0 @@
-# See more at:
-# https://github.com/ondrejbartas/sidekiq-cron
-
-# Calculations
-calculate_taxes_monthly_worker:
-  cron: '30 0 1 * * America/Sao_Paulo'
-  class: "CalculateTaxesMonthlyWorker"
