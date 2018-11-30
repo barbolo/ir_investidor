@@ -1,15 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
   <head>
-    <title>IrInvestidor</title>
+    <title>IR Investidor - Calculadora de Imposto de Renda gratuita e open source</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
+    <!-- Styles -->
+    <link rel="icon" href="<%= image_path('favicon.png') %>">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">
+    <header class="app-header navbar">
+      <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="#">
+        <%= image_tag('logo-ir-investidor.png', alt: 'IR Investidor Logo', class: 'logo') %>
+      </a>
+      <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <ul class="nav navbar-nav ml-auto">
+        <li class="nav-item d-md-down-none"></li>
+      </ul>
+    </header>
+    <div class="app-body">
+      <div class="sidebar">
+        <nav class="sidebar-nav">
+          <ul class="nav">
+            <li class="nav-title">Investimentos</li>
+            <li class="nav-item <%= 'active' if controller_name == 'transactions' %>">
+              <%= link_to transactions_list_path, class: 'nav-link' do %>
+                <i class="fas fa-bars"></i> Transações
+              <% end %>
+            </li>
+            <li class="nav-item <%= 'active' if controller_name == 'todo' %>">
+              <%= link_to transactions_list_path, class: 'nav-link' do %>
+                <i class="fas fa-chart-pie"></i> Posições</a>
+              <% end %>
+            </li>
+            <li class="nav-item <%= 'active' if controller_name == 'todo' %>">
+              <%= link_to transactions_list_path, class: 'nav-link' do %>
+                <i class="fas fa-money-bill"></i> DARFs</a>
+              <% end %>
+            </li>
+            <li class="nav-title">Sessão</li>
+            <li class="nav-item">
+              <%= link_to transactions_list_path, class: 'nav-link' do %>
+                <i class="fas fa-sign-out-alt"></i> Encerrar agora</a>
+              <% end %>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <main class="main">
+        <div class="container-fluid">
+          <% if (msg = notice).present? %>
+            <div class="alert alert-warning alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <%= msg %>
+            </div>
+          <% end %>
+
+          <% if (msg = alert).present? %>
+            <div class="alert alert-danger alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <%= msg %>
+            </div>
+          <% end %>
+
+          <%= yield %>
+        </div>
+      </main>
+    </div>
+    <footer class="app-footer">
+      <div>
+        <span>&copy; 2018 Rafael Barbolo Lopes. Versão <%= link_to APP_VERSION, "https://github.com/barbolo/ir_investidor/tree/#{APP_VERSION}", target: 'blank' %>.</span>
+      </div>
+    </footer>
   </body>
 </html>

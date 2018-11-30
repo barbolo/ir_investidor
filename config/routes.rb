@@ -7,6 +7,9 @@ end if Rails.env.production?
 
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  root to: 'transactions#list'
+
+  get 'transacoes', to: 'transactions#list', as: :transactions_list
 
   # Sidekiq Web UI
   mount Sidekiq::Web => '/sidekiq-admin'

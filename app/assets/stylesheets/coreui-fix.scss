@@ -1,0 +1,37 @@
+body {
+  font-size: 0.875rem;
+  background-color: #e4e5e6;
+  color: #23282c;
+}
+
+.navbar-brand .logo {
+  width: 100px;
+}
+
+.main {
+  padding-top: 20px
+}
+
+.app-footer a {
+  color: #c54343;
+}
+
+.sidebar i.fas {
+  margin-right: 4px;
+}
+
+.nav-item.active .nav-link i {
+  color: #d82020;
+}
+
+.nav-item.active .nav-link:hover i {
+  color: #ffffff;
+}
+
+.nav-item.active .nav-link {
+  background-color: #3a4248;
+}
+
+.nav-item .nav-link:hover {
+  background-color: #d82020 !important;
+}
