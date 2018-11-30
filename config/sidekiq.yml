@@ -1,0 +1,5 @@
+---
+:concurrency: <%= ENV.fetch("SIDEKIQ_CONCURRENCY") { 5 }.to_i %>
+:pidfile: tmp/sidekiq.pid
+:queues:
+:limits:

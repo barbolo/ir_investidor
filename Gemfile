@@ -32,6 +32,11 @@ gem 'hiredis'
 gem 'redis', '~> 4.0'
 gem 'connection_pool'
 
+# Use Sidekiq for background/asynchronous jobs
+gem 'sidekiq'
+gem 'sidekiq-limit_fetch'
+gem 'sidekiq-cron'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

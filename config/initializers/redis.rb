@@ -9,7 +9,7 @@ unless defined?(REDIS)
     # Create a Redis connection
     conn = Redis.new(url: Rails.application.secrets.redis_url_app, driver: :hiredis)
     # Set a name to identify this connection
-    conn.client.call [:client, :setname, :connection_pool_redis_app]
+    conn.call [:client, :setname, :connection_pool_redis_app]
     # Return the connection to the pool
     conn
   end
