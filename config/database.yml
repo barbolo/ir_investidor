@@ -12,22 +12,32 @@
 default: &default
   adapter: mysql2
   encoding: utf8
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: root
-  password:
-  host: db
-  port: 3316
+  database:         <%= Rails.application.secrets[:mysql_database] %>
+  host:             <%= Rails.application.secrets[:mysql_host] %>
+  port:             <%= Rails.application.secrets[:mysql_port] %>
+  username:         <%= Rails.application.secrets[:mysql_username] %>
+  password:         <%= Rails.application.secrets[:mysql_password] %>
+
+  # maximum number of threads using the database at the same time
+  pool:             <%= Rails.application.secrets[:mysql_pool] %>
+
+  # number of seconds that a connection will be kept unused in the pool before
+  # it is automatically disconnected (default 300 seconds). Set this to zero to
+  # keep connections forever.
+  idle_timeout:     <%= Rails.application.secrets[:mysql_idle_timeout] %>
+
+  # number of seconds to wait for a connection to become available before giving
+  # up and raising a timeout error (default 5 seconds).
+  checkout_timeout: <%= Rails.application.secrets[:mysql_checkout_timeout] %>
 
 development:
   <<: *default
-  database: ir_investidor_development
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: ir_investidor_test
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -50,6 +60,3 @@ test:
 #
 production:
   <<: *default
-  database: ir_investidor_production
-  username: ir_investidor
-  password: <%= ENV['IR_INVESTIDOR_DATABASE_PASSWORD'] %>
