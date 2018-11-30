@@ -27,6 +27,11 @@ gem 'turbolinks', '~> 5'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false
 
+# Use Redis as a in-memory data structure store and for cache/session store
+gem 'hiredis'
+gem 'redis', '~> 4.0'
+gem 'connection_pool'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

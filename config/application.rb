@@ -35,5 +35,15 @@ module IrInvestidor
 
     # Set default locale
     config.i18n.default_locale = 'pt-BR'
+
+    # Use Redis as cache store
+    config.cache_store = :redis_cache_store, {
+      driver: :hiredis,
+      compress: true,
+      url: Rails.application.secrets.redis_url_cache
+    }
+
+    # Use CacheStore (that uses Redis) as the session store
+    config.session_store ActionDispatch::Session::CacheStore, expire_after: 2.days
   end
 end
