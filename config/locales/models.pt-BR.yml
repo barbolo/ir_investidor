@@ -1,0 +1,45 @@
+---
+pt-BR:
+  activerecord:
+    models:
+      session:
+        one: sessão
+        other: sessões
+      session_log:
+        one: log
+        other: logs
+      order:
+        one: operação
+        other: operações
+    attributes:
+      session:
+        secret: secret
+        sheet_ready: planilha correta?
+        orders_ready: operações cadastradas?
+        calcs_ready: cálculos realizados?
+        orders: quantidade de operações
+        assets: posição atual
+        darf: DARF aberta
+        error: mensagem de erro
+        expire_at: validade
+      session_log:
+        session: sessão
+        session_id: id da sessão
+        message: mensagem
+      order:
+        session: sessão
+        session_id: id da sessão
+        row: linha da planilha
+        asset_class: ATIVO
+        order_type: OPERACAO
+        daytrade: DAYTRADE?
+        name: PAPEL
+        quantity: QTD
+        price: PRECO
+        costs: CUSTOS
+        irrf: IRRF
+        ordered_at: DATA OPERACAO
+        settlement_at: DATA LIQUIDACAO
+        new_name: NOVO PAPEL
+        old_quantity: QTD ANTIGA
+        new_quantity: QTD NOVA

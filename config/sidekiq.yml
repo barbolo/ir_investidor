@@ -2,4 +2,15 @@
 :concurrency: <%= ENV.fetch("SIDEKIQ_CONCURRENCY") { 5 }.to_i %>
 :pidfile: tmp/sidekiq.pid
 :queues:
+  - [order_create, 1]
+  - [session_expire, 1]
+  - [session_log_create, 1]
+  - [session_update, 1]
+  - [sheet_parse, 1]
 :limits:
+  order_create: 1
+  session_expire: 1
+  session_log_create: 1
+  session_update: 1
+  sheet_parse: 1
+

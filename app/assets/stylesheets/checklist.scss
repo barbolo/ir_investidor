@@ -1,0 +1,17 @@
+.checklist h2 {
+  margin-bottom: 1em;
+  color: #2f353a;
+}
+
+.checklist ul {
+  font-size: 1.6em;
+  color: #5c6873;
+}
+
+.checklist ul li.done i { color: #4dbd74; }
+
+.checklist ul li.loading i { color: #4dbd74; }
+
+.checklist ul li.pending { color: #c8ced3; }
+
+.checklist ul li.error { color: #f86c6b; }

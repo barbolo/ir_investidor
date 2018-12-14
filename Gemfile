@@ -37,6 +37,10 @@ gem 'sidekiq'
 gem 'sidekiq-limit_fetch'
 gem 'sidekiq-cron'
 
+# Read Spreadsheets
+gem "roo", "~> 2.7.0"
+gem 'roo-xls'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

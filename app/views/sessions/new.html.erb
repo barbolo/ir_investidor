@@ -1,0 +1,15 @@
+<%= form_for @session do |f| %>
+  <div class="text-center">
+    <p class="text-muted">Veja <%= link_to 'aqui', 'http://bit.ly/irinvestidor-planilha', target: 'blank' %> um exemplo de como deve ser sua planilha de operações.</p>
+  </div>
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+    </div>
+    <div class="custom-file">
+      <%= f.file_field :sheet, class: 'custom-file-input', accept: '.xls,.xlsx,.ods,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv' %>
+      <%= f.label :sheet, 'Selecione um arquivo csv, xlsx, ods, xls, ...', class: 'custom-file-label' %>
+    </div>
+  </div>
+  <%= f.submit 'Calcular Imposto de Renda', class: 'btn btn-block btn-success' %>
+<% end %>

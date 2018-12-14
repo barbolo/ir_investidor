@@ -1,0 +1,45 @@
+<div id="sheetProcessingChecklist" class="checklist clearfix">
+  <h2 class="text-center"><%= current_session.error.present? ? 'Ocorreu um erro' : 'Calculando...' %></h2>
+
+  <ul class="fa-ul">
+    <li class="<%= checklist_class(current_session.sheet_ready, true) %>">
+      <span class="fa-li">
+        <i class="<%= checklist_fa_class(current_session.sheet_ready, true) %>"></i>
+      </span>
+      <span>Planilha recebida</span>
+      </span>
+    </li>
+
+    <li class="<%= checklist_class(current_session.orders_ready, current_session.sheet_ready) %>">
+      <span class="fa-li">
+        <i class="<%= checklist_fa_class(current_session.orders_ready, current_session.sheet_ready) %>"></i>
+      </span>
+      <% if current_session.orders_count.to_i > 0 %>
+        <span><%= number_with_delimiter current_session.orders_count %> operações cadastradas</span>
+      <% else %>
+        <span>Operações cadastradas</span>
+      <% end %>
+      </span>
+    </li>
+
+    <li class="<%= checklist_class(current_session.calcs_ready, current_session.orders_ready) %>">
+      <span class="fa-li">
+        <i class="<%= checklist_fa_class(current_session.calcs_ready, current_session.orders_ready) %>"></i>
+      </span>
+      <% if current_session.assets_value.to_f > 0 %>
+        <span>Posições (<%= number_to_currency current_session.assets_value %>) e impostos calculados</span>
+      <% else %>
+        <span>Posições e impostos calculados</span>
+      <% end %>
+      </span>
+    </li>
+  </ul>
+
+  <% if current_session.error.present? %>
+    <div class="text-danger pl-4">
+      <strong>Descrição do erro:</strong><br>
+      <span><%= current_session.error %></span>
+    </div>
+  <% end %>
+
+</div>

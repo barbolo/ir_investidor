@@ -6,10 +6,11 @@ Sidekiq::Web.use Rack::Auth::Basic do |username, password|
 end if Rails.env.production?
 
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
-  root to: 'transactions#list'
+  root to: 'sessions#new'
 
-  get 'transacoes', to: 'transactions#list', as: :transactions_list
+  resources :sessions, path: 'calculando', param: :secret, except: [:index, :edit, :update]
+
+  get ':secret/transacoes', to: 'transactions#list', as: :transactions_list
 
   # Sidekiq Web UI
   mount Sidekiq::Web => '/sidekiq-admin'
