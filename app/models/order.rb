@@ -1,4 +1,6 @@
 class Order < ApplicationRecord
+  belongs_to :session
+
   ASSET_CLASS = {
     'acao'       => 'ACAO',
     'opcao'      => 'OPCAO',
@@ -30,6 +32,17 @@ class Order < ApplicationRecord
     order.validates :new_name, presence: true
     order.validates :old_quantity, presence: true, numericality: { greater_than: 0 }
     order.validates :new_quantity, presence: true, numericality: { greater_than: 0 }
+  end
+
+  def price_considering_costs
+    case order_type
+    when Order::TYPE['compra']
+      (quantity * price + costs) / quantity
+    when Order::TYPE['venda']
+      (quantity * price - costs) / quantity
+    else
+      price
+    end
   end
 
   private

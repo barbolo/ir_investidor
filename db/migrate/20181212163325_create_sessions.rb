@@ -5,7 +5,7 @@ class CreateSessions < ActiveRecord::Migration[5.2]
       t.boolean :sheet_ready
       t.boolean :orders_ready
       t.boolean :calcs_ready
-      t.integer :orders_count
+      t.integer :orders_count, unsigned: true
       t.decimal :assets_value, precision: 10, scale: 2
       t.string :error
 

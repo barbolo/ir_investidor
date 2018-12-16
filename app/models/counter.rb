@@ -23,7 +23,7 @@ class Counter
         conn.incrby(key, increment)
         conn.expire(key, expiry)
       end
-    end
+    end.first
   end
 
   def decr(increment=1, expiry=1.hour)
@@ -32,7 +32,7 @@ class Counter
         conn.decrby(key, increment)
         conn.expire(key, expiry)
       end
-    end
+    end.first
   end
 
   def expire

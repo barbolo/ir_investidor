@@ -8,6 +8,9 @@ class OrderCreateWorker
       message = "Operação da linha #{attributes['row']} descartada. #{order.errors.full_messages.join(', ')}"
       SessionLogCreateWorker.perform_async(attributes['session_id'], message)
     end
-    Session.counter(attributes['session_id'], 'orders_pending').decr(1)
+
+    if Session.counter(attributes['session_id'], 'orders_pending').decr(1) == 0
+      OrderAfterCreateAllWorker.perform_async(attributes['session_id'])
+    end
   end
 end

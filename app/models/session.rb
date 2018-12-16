@@ -1,6 +1,8 @@
 class Session < ApplicationRecord
-  has_one_attached :sheet
-  has_many :session_logs
+  has_one_attached :sheet, dependent: :destroy
+  has_many :session_logs, dependent: :destroy
+  has_many :orders, dependent: :destroy
+  has_many :assets, dependent: :destroy
 
   validate :validate_sheet
 

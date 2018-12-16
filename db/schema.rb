@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_14_123048) do
+ActiveRecord::Schema.define(version: 2018_12_15_150421) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -33,22 +33,38 @@ ActiveRecord::Schema.define(version: 2018_12_14_123048) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
+  create_table "assets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "session_id"
+    t.string "asset_class"
+    t.string "name"
+    t.integer "quantity"
+    t.decimal "price", precision: 10, scale: 2, unsigned: true
+    t.decimal "current_price", precision: 10, scale: 2, unsigned: true
+    t.decimal "value", precision: 10, scale: 2
+    t.decimal "current_value", precision: 10, scale: 2
+    t.decimal "profit", precision: 10, scale: 2
+    t.date "last_order_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["session_id", "asset_class", "name"], name: "index_assets_on_session_id_and_asset_class_and_name"
+  end
+
   create_table "orders", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "session_id"
-    t.integer "row"
+    t.integer "row", unsigned: true
     t.string "asset_class"
     t.string "order_type"
     t.boolean "daytrade"
     t.string "name"
-    t.integer "quantity"
-    t.decimal "price", precision: 10, scale: 2
-    t.decimal "costs", precision: 10, scale: 2
-    t.decimal "irrf", precision: 10, scale: 2
+    t.integer "quantity", unsigned: true
+    t.decimal "price", precision: 10, scale: 2, unsigned: true
+    t.decimal "costs", precision: 10, scale: 2, unsigned: true
+    t.decimal "irrf", precision: 10, scale: 2, unsigned: true
     t.date "ordered_at"
     t.date "settlement_at"
     t.string "new_name"
-    t.decimal "old_quantity", precision: 10, scale: 2
-    t.decimal "new_quantity", precision: 10, scale: 2
+    t.decimal "old_quantity", precision: 10, scale: 2, unsigned: true
+    t.decimal "new_quantity", precision: 10, scale: 2, unsigned: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["session_id", "ordered_at"], name: "index_orders_on_session_id_and_ordered_at"
@@ -67,7 +83,7 @@ ActiveRecord::Schema.define(version: 2018_12_14_123048) do
     t.boolean "sheet_ready"
     t.boolean "orders_ready"
     t.boolean "calcs_ready"
-    t.integer "orders_count"
+    t.integer "orders_count", unsigned: true
     t.decimal "assets_value", precision: 10, scale: 2
     t.string "error"
     t.timestamp "expire_at"
@@ -76,6 +92,7 @@ ActiveRecord::Schema.define(version: 2018_12_14_123048) do
     t.index ["secret"], name: "index_sessions_on_secret", unique: true
   end
 
+  add_foreign_key "assets", "sessions"
   add_foreign_key "orders", "sessions"
   add_foreign_key "session_logs", "sessions"
 end

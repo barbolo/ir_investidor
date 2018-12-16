@@ -51,6 +51,10 @@ class SheetParseWorker
 
     # Set a counter to follow the progress of orders being processed
     Session.counter(session_id, 'orders_pending').incr(row_index - 2)
+
+    # After a timeout of 2 minutes, we'll call a hook that should be
+    # automatically called just after all orders from the sheet were created.
+    OrderAfterCreateAllWorker.perform_in(2.minutes, session_id)
   end
 
   def learn_headers(row)
