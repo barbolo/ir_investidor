@@ -33,9 +33,10 @@ class SheetParseWorker
     end
 
     # parse sheet and create orders
+    iterate_method = sheet.respond_to?(:each_row_streaming) ? :each_row_streaming : :each
     headers = nil
     row_index = 1
-    sheet.each do |row|
+    sheet.send(iterate_method) do |row|
       if row_index == 1
         headers = learn_headers(row)
         if (missing = REQUIRED_HEADERS.keys - headers.keys).size > 0
@@ -72,19 +73,49 @@ class SheetParseWorker
     {
       'session_id'    => session_id,
       'row'           => row_index,
-      'asset_class'   => (row[headers['ATIVO']].try(:upcase) if headers['ATIVO']),
-      'order_type'    => (row[headers['OPERACAO']].try(:upcase) if headers['OPERACAO']),
-      'daytrade'      => (row[headers['DAYTRADE?']].try(:upcase) == 'S' if headers['DAYTRADE?']),
-      'name'          => (row[headers['PAPEL']].try(:upcase) if headers['PAPEL']),
-      'quantity'      => (row[headers['QTD']] if headers['QTD']),
-      'price'         => (row[headers['PRECO']] if headers['PRECO']),
-      'costs'         => (row[headers['CUSTOS']] if headers['CUSTOS']),
-      'irrf'          => (row[headers['IRRF']] if headers['IRRF']),
-      'ordered_at'    => (row[headers['DATA OPERACAO']] if headers['DATA OPERACAO']),
-      'settlement_at' => (row[headers['DATA LIQUIDACAO']] if headers['DATA LIQUIDACAO']),
-      'new_name'      => (row[headers['NOVO PAPEL']].try(:upcase) if headers['NOVO PAPEL']),
-      'old_quantity'  => (row[headers['QTD ANTIGA']] if headers['QTD ANTIGA']),
-      'new_quantity'  => (row[headers['QTD NOVA']] if headers['QTD NOVA']),
+      'asset_class'   => parse_cell(row[headers['ATIVO']]).try(:upcase),
+      'order_type'    => parse_cell(row[headers['OPERACAO']]).try(:upcase),
+      'daytrade'      => parse_boolean(row[headers['DAYTRADE?']]).try(:upcase),
+      'name'          => parse_cell(row[headers['PAPEL']]).try(:upcase),
+      'quantity'      => parse_number(row[headers['QTD']]),
+      'price'         => parse_number(row[headers['PRECO']]),
+      'costs'         => parse_number(row[headers['CUSTOS']]),
+      'irrf'          => parse_number(row[headers['IRRF']]),
+      'ordered_at'    => parse_cell(row[headers['DATA OPERACAO']]),
+      'settlement_at' => parse_cell(row[headers['DATA LIQUIDACAO']]),
+      'new_name'      => parse_cell(row[headers['NOVO PAPEL']]).try(:upcase),
+      'old_quantity'  => parse_number(row[headers['QTD ANTIGA']]),
+      'new_quantity'  => parse_number(row[headers['QTD NOVA']]),
     }
+  end
+
+  def parse_cell(cell)
+    return nil if cell.nil?
+    case cell.class.to_s
+    when /Roo\:\:Excelx/
+      cell.value
+    else
+      cell.to_s
+    end
+  end
+
+  def parse_number(cell)
+    return nil if cell.nil?
+    case cell.class.to_s
+    when /Roo\:\:Excelx/
+      cell.value
+    else
+      cell.to_s.gsub('.', '').gsub(',', '.').gsub(/[^0-9.]/, '')
+    end
+  end
+
+  def parse_boolean(cell)
+    return nil if cell.nil?
+    case cell.class.to_s
+    when /Roo\:\:Excelx/
+      cell.value
+    else
+      cell.to_s.upcase == 'S'
+    end
   end
 end

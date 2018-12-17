@@ -15,8 +15,7 @@ class Session < ApplicationRecord
 
   private
     def validate_sheet
-      if !sheet.attached? ||
-          Roo::CLASS_FOR_EXTENSION[sheet.filename.extension.to_sym].nil?
+      if !sheet.attached? || Roo::CLASS_FOR_EXTENSION[sheet.filename.extension.to_sym].nil?
         errors.add(:sheet)
       end
     end
@@ -29,5 +28,10 @@ class Session < ApplicationRecord
     def after_create_hook
       SheetParseWorker.perform_async(id)
       SessionExpireWorker.perform_in(1.hour, id)
+    end
+
+    def destroy
+      ActiveStorage::Blob.where(key: sheet.key).take.try(:destroy) if sheet.attached?
+      super
     end
 end
