@@ -1,0 +1,46 @@
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-bars"></i> Operações</div>
+  <div class="card-body">
+    <table class="table table-hover table-striped table-responsive-sm table-sm">
+      <thead class="thead-dark">
+        <tr>
+          <th>Linha</th>
+          <th>Ativo</th>
+          <th>Operação</th>
+          <th>Daytrade?</th>
+          <th>Papel</th>
+          <th>Quantidade</th>
+          <th>Preço</th>
+          <th>Custos</th>
+          <th>IRRF</th>
+          <th>Data da Operação</th>
+          <th>Data da Liquidação</th>
+          <th>Novo Papel</th>
+          <th>Quantidade Antiga</th>
+          <th>Quantidade Nova</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @orders.each do |order| %>
+          <tr>
+            <td><%= order.row %></td>
+            <td><%= order.asset_class %></td>
+            <td><%= order.order_type %></td>
+            <td><%= order.daytrade? ? 'S' : 'N' %></td>
+            <td><%= order.name %></td>
+            <td><%= number_with_delimiter order.quantity %></td>
+            <td><%= number_to_currency order.price %></td>
+            <td><%= number_to_currency order.costs %></td>
+            <td><%= number_to_currency order.irrf %></td>
+            <td><%= l(order.ordered_at, format: :short) if order.ordered_at%></td>
+            <td><%= l(order.settlement_at, format: :short) if order.settlement_at%></td>
+            <td><%= order.new_name %></td>
+            <td><%= number_with_delimiter order.old_quantity %></td>
+            <td><%= number_with_delimiter order.new_quantity %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

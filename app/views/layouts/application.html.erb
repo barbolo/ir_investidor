@@ -37,23 +37,23 @@
           <ul class="nav">
             <li class="nav-title">Investimentos</li>
             <li class="nav-item <%= 'active' if controller_name == 'transactions' %>">
-              <%= link_to transactions_list_path, class: 'nav-link' do %>
+              <%= link_to transactions_path, class: 'nav-link' do %>
                 <i class="fas fa-bars"></i> Operações
               <% end %>
             </li>
-            <li class="nav-item <%= 'active' if controller_name == 'todo' %>">
-              <%= link_to transactions_list_path, class: 'nav-link' do %>
+            <li class="nav-item <%= 'active' if controller_name == 'assets' %>">
+              <%= link_to assets_path, class: 'nav-link' do %>
                 <i class="fas fa-chart-pie"></i> Posições</a>
               <% end %>
             </li>
             <li class="nav-item <%= 'active' if controller_name == 'todo' %>">
-              <%= link_to transactions_list_path, class: 'nav-link' do %>
-                <i class="fas fa-money-bill"></i> DARFs</a>
+              <%= link_to taxes_path(period: Date.today.beginning_of_month), class: 'nav-link' do %>
+                <i class="fas fa-money-bill"></i> Impostos</a>
               <% end %>
             </li>
             <li class="nav-title">Sessão</li>
             <li class="nav-item">
-              <%= link_to transactions_list_path, class: 'nav-link' do %>
+              <%= link_to transactions_path, class: 'nav-link' do %>
                 <i class="fas fa-sign-out-alt"></i> Encerrar agora</a>
               <% end %>
             </li>

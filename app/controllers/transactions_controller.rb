@@ -1,4 +1,5 @@
 class TransactionsController < ApplicationController
-  def list
+  def index
+    @orders = current_session.orders.order(:ordered_at)
   end
 end

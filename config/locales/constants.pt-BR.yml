@@ -1,0 +1,9 @@
+---
+pt-BR:
+  constants:
+    asset:
+      type:
+        ACAO: Ação
+        OPCAO: Opção
+        FII: 'Fundo Imobiliário (FII)'
+        SUBSCRICAO: Subscrição

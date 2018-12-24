@@ -68,11 +68,9 @@ class TaxCalculator
       'irrf'     => 0,
     }
 
-    taxes.sort_by { |period, _| period }.each do |period, tax_period|
-      acao       = tax_period[Asset::TYPE['acao']]
-      opcao      = tax_period[Asset::TYPE['opcao']]
-      fii        = tax_period[Asset::TYPE['fii']]
-      subscricao = tax_period[Asset::TYPE['subscricao']]
+    period, _ = taxes.sort_by { |period, _| period }.first
+    while period <= Date.today
+      tax_period = taxes[period]
 
       tax = Tax.new
       tax.session_id            = session.id
@@ -83,88 +81,130 @@ class TaxCalculator
       tax.daytrade_irrf_aliquot = IRRF_ALIQUOT['daytrade']
       tax.fii_tax_aliquot       = TAX_ALIQUOT['fii']
 
-      # "Ganhos líquidos em operações no mercado à vista de ações negociadas em
-      #  bolsa de valores nas alienações realizadas até R$ 20.000, em cada mês,
-      #  para o conjunto de ações"
-      tax.stocks_sales = acao['common']['sales'] + acao['daytrade']['sales']
-      if tax.stocks_sales <= 20_000 && acao['common']['earnings'] > 0
-        tax.stocks_taxfree_profits = acao['common']['earnings']
-        acao['common']['earnings'] = 0
-      else
-        tax.stocks_taxfree_profits = 0
-      end
+      if tax_period.present?
+        acao       = tax_period[Asset::TYPE['acao']]
+        opcao      = tax_period[Asset::TYPE['opcao']]
+        fii        = tax_period[Asset::TYPE['fii']]
+        subscricao = tax_period[Asset::TYPE['subscricao']]
 
-      # OPERAÇÕES COMUNS
-      tax.common_stocks_earnings        = acao['common']['earnings']
-      tax.common_options_earnings       = opcao['common']['earnings']
-      tax.common_subscriptions_earnings = subscricao['common']['earnings']
-      tax.common_earnings         = tax.common_stocks_earnings + tax.common_options_earnings + tax.common_subscriptions_earnings
-      tax.common_sales            = acao['common']['sales'] + opcao['common']['sales'] + subscricao['common']['sales']
-      tax.common_irrf             = tax.common_sales * tax.common_irrf_aliquot
-      tax.common_losses_before    = accumulated['common']
-      tax.common_taxable_value    = tax.common_earnings - tax.common_losses_before
-      if tax.common_taxable_value < 0
-        tax.common_losses_after   = - tax.common_taxable_value
-        tax.common_taxable_value  = 0
-        tax.common_tax_due        = 0
-      else
-        tax.common_losses_after   = 0
-        tax.common_tax_due        = tax.common_taxable_value * tax.common_tax_aliquot
-      end
-      accumulated['common']       = tax.common_losses_after
+        # "Ganhos líquidos em operações no mercado à vista de ações negociadas em
+        #  bolsa de valores nas alienações realizadas até R$ 20.000, em cada mês,
+        #  para o conjunto de ações"
+        tax.stocks_sales = acao['common']['sales'] + acao['daytrade']['sales']
+        if tax.stocks_sales <= 20_000 && acao['common']['earnings'] > 0
+          tax.stocks_taxfree_profits = acao['common']['earnings']
+          acao['common']['earnings'] = 0
+        else
+          tax.stocks_taxfree_profits = 0
+        end
 
-      # OPERAÇÕES DAY-TRADE
-      tax.daytrade_stocks_earnings  = acao['daytrade']['earnings']
-      tax.daytrade_options_earnings = opcao['daytrade']['earnings']
-      tax.daytrade_earnings         = tax.daytrade_stocks_earnings + tax.daytrade_options_earnings
-      tax.daytrade_sales            = acao['daytrade']['sales'] + opcao['daytrade']['sales']
-      tax.daytrade_irrf             = tax.daytrade_sales * tax.daytrade_irrf_aliquot
-      tax.daytrade_losses_before    = accumulated['daytrade']
-      tax.daytrade_taxable_value    = tax.daytrade_earnings - tax.daytrade_losses_before
-      if tax.daytrade_taxable_value < 0
-        tax.daytrade_losses_after   = - tax.daytrade_taxable_value
-        tax.daytrade_taxable_value  = 0
-        tax.daytrade_tax_due        = 0
-      else
-        tax.daytrade_losses_after   = 0
-        tax.daytrade_tax_due        = tax.daytrade_taxable_value * tax.daytrade_tax_aliquot
-      end
-      accumulated['daytrade']       = tax.daytrade_losses_after
+        # OPERAÇÕES COMUNS
+        tax.common_stocks_earnings        = acao['common']['earnings']
+        tax.common_options_earnings       = opcao['common']['earnings']
+        tax.common_subscriptions_earnings = subscricao['common']['earnings']
+        tax.common_earnings         = tax.common_stocks_earnings + tax.common_options_earnings + tax.common_subscriptions_earnings
+        tax.common_sales            = acao['common']['sales'] + opcao['common']['sales'] + subscricao['common']['sales']
+        tax.common_irrf             = tax.common_sales * tax.common_irrf_aliquot
+        tax.common_losses_before    = accumulated['common']
+        tax.common_taxable_value    = tax.common_earnings - tax.common_losses_before
+        if tax.common_taxable_value < 0
+          tax.common_losses_after   = - tax.common_taxable_value
+          tax.common_taxable_value  = 0
+          tax.common_tax_due        = 0
+        else
+          tax.common_losses_after   = 0
+          tax.common_tax_due        = tax.common_taxable_value * tax.common_tax_aliquot
+        end
+        accumulated['common']       = tax.common_losses_after
 
-      # FII
-      tax.fii_earnings         = fii['common']['earnings'] + fii['daytrade']['earnings']
-      tax.fii_sales            = fii['common']['sales'] + fii['daytrade']['sales']
-      tax.fii_irrf             = fii['common']['sales'] * tax.common_irrf_aliquot + fii['daytrade']['sales'] * tax.daytrade_irrf_aliquot
-      tax.fii_losses_before    = accumulated['fii']
-      tax.fii_taxable_value    = tax.fii_earnings - tax.fii_losses_before
-      if tax.fii_taxable_value < 0
-        tax.fii_losses_after   = - tax.fii_taxable_value
-        tax.fii_taxable_value  = 0
-        tax.fii_tax_due        = 0
-      else
-        tax.fii_losses_after   = 0
-        tax.fii_tax_due        = tax.fii_taxable_value * tax.fii_tax_aliquot
-      end
-      accumulated['fii']       = tax.fii_losses_after
+        # OPERAÇÕES DAY-TRADE
+        tax.daytrade_stocks_earnings  = acao['daytrade']['earnings']
+        tax.daytrade_options_earnings = opcao['daytrade']['earnings']
+        tax.daytrade_earnings         = tax.daytrade_stocks_earnings + tax.daytrade_options_earnings
+        tax.daytrade_sales            = acao['daytrade']['sales'] + opcao['daytrade']['sales']
+        tax.daytrade_irrf             = tax.daytrade_sales * tax.daytrade_irrf_aliquot
+        tax.daytrade_losses_before    = accumulated['daytrade']
+        tax.daytrade_taxable_value    = tax.daytrade_earnings - tax.daytrade_losses_before
+        if tax.daytrade_taxable_value < 0
+          tax.daytrade_losses_after   = - tax.daytrade_taxable_value
+          tax.daytrade_taxable_value  = 0
+          tax.daytrade_tax_due        = 0
+        else
+          tax.daytrade_losses_after   = 0
+          tax.daytrade_tax_due        = tax.daytrade_taxable_value * tax.daytrade_tax_aliquot
+        end
+        accumulated['daytrade']       = tax.daytrade_losses_after
 
-      # TOTAL
-      tax.tax_due      = tax.common_tax_due + tax.daytrade_tax_due + tax.fii_tax_due
-      tax.irrf         = tax.common_irrf + tax.daytrade_irrf + tax.fii_irrf
-      tax.irrf_before  = accumulated['irrf']
-      accumulated_irrf = tax.irrf + tax.irrf_before
-      if tax.tax_due > 0
-        irrf_discount  = [accumulated_irrf, tax.tax_due].min
-        tax.irrf_after = accumulated_irrf - irrf_discount
-        tax.darf       = tax.tax_due - irrf_discount
+        # FII
+        tax.fii_earnings         = fii['common']['earnings'] + fii['daytrade']['earnings']
+        tax.fii_sales            = fii['common']['sales'] + fii['daytrade']['sales']
+        tax.fii_irrf             = fii['common']['sales'] * tax.common_irrf_aliquot + fii['daytrade']['sales'] * tax.daytrade_irrf_aliquot
+        tax.fii_losses_before    = accumulated['fii']
+        tax.fii_taxable_value    = tax.fii_earnings - tax.fii_losses_before
+        if tax.fii_taxable_value < 0
+          tax.fii_losses_after   = - tax.fii_taxable_value
+          tax.fii_taxable_value  = 0
+          tax.fii_tax_due        = 0
+        else
+          tax.fii_losses_after   = 0
+          tax.fii_tax_due        = tax.fii_taxable_value * tax.fii_tax_aliquot
+        end
+        accumulated['fii']       = tax.fii_losses_after
+
+        # TOTAL
+        tax.tax_due      = tax.common_tax_due + tax.daytrade_tax_due + tax.fii_tax_due
+        tax.irrf         = tax.common_irrf + tax.daytrade_irrf + tax.fii_irrf
+        tax.irrf_before  = accumulated['irrf']
+        accumulated_irrf = tax.irrf + tax.irrf_before
+        if tax.tax_due > 0
+          irrf_discount  = [accumulated_irrf, tax.tax_due].min
+          tax.irrf_after = accumulated_irrf - irrf_discount
+          tax.darf       = tax.tax_due - irrf_discount
+        else
+          tax.irrf_after = accumulated_irrf
+          tax.darf = 0
+        end
+        accumulated['irrf'] = tax.irrf_after
+
       else
-        tax.irrf_after = accumulated_irrf
-        tax.darf = 0
+        tax.darf                          = 0
+        tax.tax_due                       = 0
+        tax.irrf                          = 0
+        tax.irrf_before                   = accumulated['irrf']
+        tax.irrf_after                    = accumulated['irrf']
+        tax.stocks_sales                  = 0
+        tax.stocks_taxfree_profits        = 0
+        tax.common_stocks_earnings        = 0
+        tax.common_options_earnings       = 0
+        tax.common_subscriptions_earnings = 0
+        tax.common_earnings               = 0
+        tax.common_sales                  = 0
+        tax.common_losses_before          = accumulated['common']
+        tax.common_taxable_value          = 0
+        tax.common_losses_after           = accumulated['common']
+        tax.common_tax_due                = 0
+        tax.common_irrf                   = 0
+        tax.daytrade_stocks_earnings      = 0
+        tax.daytrade_options_earnings     = 0
+        tax.daytrade_earnings             = 0
+        tax.daytrade_sales                = 0
+        tax.daytrade_losses_before        = accumulated['daytrade']
+        tax.daytrade_taxable_value        = 0
+        tax.daytrade_losses_after         = accumulated['daytrade']
+        tax.daytrade_tax_due              = 0
+        tax.daytrade_irrf                 = 0
+        tax.fii_earnings                  = 0
+        tax.fii_sales                     = 0
+        tax.fii_losses_before             = accumulated['fii']
+        tax.fii_taxable_value             = 0
+        tax.fii_losses_after              = accumulated['fii']
+        tax.fii_tax_due                   = 0
+        tax.fii_irrf                      = 0
       end
-      accumulated['irrf'] = tax.irrf_after
 
       tax.save!
 
-      tax_period.each do |asset_class, tax_common_daytrade|
+      (tax_period || []).each do |asset_class, tax_common_daytrade|
         tax_common_daytrade.each do |common_daytrade, t|
           t['entries'].each do |entry|
             TaxEntry.create!(entry.merge(
@@ -175,6 +215,7 @@ class TaxCalculator
           end
         end
       end
+      period += 1.month
     end
   end
 

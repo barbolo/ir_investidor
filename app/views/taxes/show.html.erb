@@ -1,0 +1,206 @@
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-money-bill"></i> Impostos referentes ao mês de <strong><%= l @tax.period, format: :month %></strong></div>
+  <div class="card-body">
+    <div id="darf">
+      <h4><%= l @tax.period, format: :month %></h4>
+      <br>
+
+      <table class="table table-hover table-bordered table-striped table-responsive-sm table-sm">
+        <thead class="thead-dark">
+          <tr>
+            <th>Isenções de impostos</th>
+            <th>Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Vendas de ações no mês</td>
+            <td>
+              <%= number_to_currency @tax.stocks_sales %>
+              <% if @tax.stocks_sales <= 20_000 %>
+                <span class="badge badge-success" >ISENTO DE IR</span>
+              <% end %>
+            </td>
+          </tr>
+          <tr>
+            <td>Ganhos líquidos em operações no mercado à vista de ações negociadas em bolsas de valores nas alienações realizadas até R$ 20.000,00, em cada mês, para o conjunto de ações</td>
+            <td class="colorize-number"><%= number_to_currency @tax.stocks_taxfree_profits %></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br>
+
+      <table class="table table-hover table-bordered table-striped table-responsive-sm table-sm">
+        <thead class="thead-dark">
+          <tr>
+            <th colspan="4">Ganhos líquidos ou perdas</th>
+          </tr>
+          <tr>
+            <th>Tipo de mercado/ativo</th>
+            <th>Operações comuns</th>
+            <th>Operações day-trade</th>
+            <th>Operações de FIIs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mercado à vista - Ações</td>
+            <td class="colorize-number"><%= number_to_currency @tax.common_stocks_earnings %></td>
+            <td class="colorize-number"><%= number_to_currency @tax.daytrade_stocks_earnings %></td>
+            <td><%= number_to_currency 0 %></td>
+          </tr>
+          <tr>
+            <td>Mercado de opções - Ações</td>
+            <td class="colorize-number"><%= number_to_currency @tax.common_options_earnings %></td>
+            <td class="colorize-number"><%= number_to_currency @tax.daytrade_options_earnings %></td>
+            <td><%= number_to_currency 0 %></td>
+          </tr>
+          <tr>
+            <td>Fundos de Investimentos Imobiliários (FIIs)</td>
+            <td><%= number_to_currency 0 %></td>
+            <td><%= number_to_currency 0 %></td>
+            <td class="colorize-number"><%= number_to_currency @tax.fii_earnings %></td>
+          </tr>
+          <tr class="thead-light">
+            <th colspan="4">Consolidação</th>
+          </tr>
+          <tr>
+            <td>Resultado líquido no mês</td>
+            <td class="colorize-number"><%= number_to_currency @tax.common_earnings %></td>
+            <td class="colorize-number"><%= number_to_currency @tax.daytrade_earnings %></td>
+            <td class="colorize-number"><%= number_to_currency @tax.fii_earnings %></td>
+          </tr>
+          <tr>
+            <td>Resultado negativo até o mês anterior</td>
+            <td><%= number_to_currency @tax.common_losses_before %></td>
+            <td><%= number_to_currency @tax.daytrade_losses_before %></td>
+            <td><%= number_to_currency @tax.fii_losses_before %></td>
+          </tr>
+          <tr>
+            <td>Base de cálculo do imposto</td>
+            <td class="colorize-number"><%= number_to_currency @tax.common_taxable_value %></td>
+            <td class="colorize-number"><%= number_to_currency @tax.daytrade_taxable_value %></td>
+            <td class="colorize-number"><%= number_to_currency @tax.fii_taxable_value %></td>
+          </tr>
+          <tr>
+            <td>Prejuízo a compensar</td>
+            <td><%= number_to_currency @tax.common_losses_after %></td>
+            <td><%= number_to_currency @tax.daytrade_losses_after %></td>
+            <td><%= number_to_currency @tax.fii_losses_after %></td>
+          </tr>
+          <tr>
+            <td>Alíquota do imposto</td>
+            <td><%= number_to_percentage 100 * @tax.common_tax_aliquot, precision: 0 %></td>
+            <td><%= number_to_percentage 100 * @tax.daytrade_tax_aliquot, precision: 0 %></td>
+            <td><%= number_to_percentage 100 * @tax.fii_tax_aliquot, precision: 0 %></td>
+          </tr>
+          <tr>
+            <td>Imposto devido</td>
+            <td class="colorize-number"><%= number_to_currency @tax.common_tax_due %></td>
+            <td class="colorize-number"><%= number_to_currency @tax.daytrade_tax_due %></td>
+            <td class="colorize-number"><%= number_to_currency @tax.fii_tax_due %></td>
+          </tr>
+          <tr>
+            <td>Imposto devido total</td>
+            <td colspan="3" class="text-center"><%= number_to_currency @tax.tax_due %></td>
+          </tr>
+          <tr>
+            <td>Imposto retido (IRRF) meses anteriores</td>
+            <td colspan="3" class="text-center"><%= number_to_currency @tax.irrf_before %></td>
+          </tr>
+          <tr>
+            <td>Imposto retido (IRRF) no mês</td>
+            <td colspan="3" class="text-center"><%= number_to_currency @tax.irrf %></td>
+          </tr>
+          <tr>
+            <td>Imposto retido (IRRF) a compensar</td>
+            <td colspan="3" class="text-center"><%= number_to_currency @tax.irrf_after %></td>
+          </tr>
+          <tr class="thead-light">
+            <th>Imposto a pagar via DARF</th>
+            <th colspan="3" class="text-center colorize-number"><%= number_to_currency @tax.darf %></th>
+          </tr>
+        </tbody>
+      </table>
+
+      <br>
+
+      <table class="table table-hover table-bordered table-striped table-responsive-sm table-sm">
+        <thead class="thead-dark">
+          <tr>
+            <th colspan="8">Detalhamento</th>
+          </tr>
+          <tr>
+            <th>Ativo</th>
+            <th>Papel</th>
+            <th>Ganho líquido</th>
+            <th>Day trade?</th>
+            <th>Alíquota</th>
+            <th>Imposto</th>
+            <th>IRRF</th>
+            <th>Data da alienação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @tax.tax_entries.order(:asset_class, :disposed_at).each do |entry| %>
+            <tr>
+              <td><%= t entry.asset_class, scope: [:constants, :asset, :type] %></td>
+              <td><%= entry.name %></td>
+              <td class="colorize-number"><%= number_to_currency entry.earnings %></td>
+              <td><%= entry.daytrade? ? 'Sim' : 'Não' %></td>
+              <td><%= number_to_percentage 100 * entry.tax_aliquot, precision: 0 %></td>
+              <td><%= number_to_currency entry.tax_due %></td>
+              <td><%= number_to_currency entry.irrf %></td>
+              <td><%= l entry.disposed_at.to_date %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+    </div>
+
+    <button type="button" class="btn btn-outline-dark" onclick="printElement('#darf');"><i class="fas fa-print"></i>&nbsp; Imprimir</button>
+  </div>
+</div>
+
+
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-money-bill"></i> Impostos desde <strong><%= l @first_period, format: :month %></strong></div>
+  <div class="card-body">
+    <table class="table table-hover table-bordered table-striped table-responsive-sm table-sm">
+      <thead class="thead-dark">
+        <tr>
+          <tr>
+            <th style="width: 7.6923%"></th>
+            <th style="width: 7.6923%">JAN</th>
+            <th style="width: 7.6923%">FEV</th>
+            <th style="width: 7.6923%">MAR</th>
+            <th style="width: 7.6923%">ABR</th>
+            <th style="width: 7.6923%">MAI</th>
+            <th style="width: 7.6923%">JUN</th>
+            <th style="width: 7.6923%">JUL</th>
+            <th style="width: 7.6923%">AGO</th>
+            <th style="width: 7.6923%">SET</th>
+            <th style="width: 7.6923%">OUT</th>
+            <th style="width: 7.6923%">NOV</th>
+            <th style="width: 7.6923%">DEZ</th>
+          </tr>
+        </tr>
+      </thead>
+      <tbody>
+        <% (@first_period.year..Date.today.year).to_a.reverse.each do |year| %>
+          <tr>
+            <th><%= year %></th>
+            <% (1..12).each do |month| %>
+              <% tax = @taxes.try(:[], year).try(:[], month) %>
+              <td><%= link_to number_to_currency(tax.darf), taxes_path(period: tax.period) if tax %></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

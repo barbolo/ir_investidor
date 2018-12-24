@@ -1,0 +1,89 @@
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-chart-pie"></i> Posições</div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <table class="table table-hover table-striped table-responsive-sm table-sm">
+          <thead class="thead-dark">
+            <tr>
+              <th>Ativo</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% sum = 0 %>
+            <% Asset::TYPE.each do |key, value| %>
+              <% sum += (asset_sum = current_session.assets.where(asset_class: value).sum(:current_value)) %>
+              <tr>
+                <td><%= t value, scope: [:constants, :asset, :type] %></td>
+                <td><%= number_to_currency asset_sum %></td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th>Total</th>
+              <th><%= number_to_currency sum %></th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% Asset::TYPE.each do |key, asset_class| %>
+
+  <%
+    value         = 0
+    current_value = 0
+  %>
+
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-chart-pie"></i> <%= t asset_class, scope: [:constants, :asset, :type] %></div>
+    <div class="card-body">
+      <table class="table table-hover table-striped table-responsive-sm table-sm">
+        <thead class="thead-dark">
+          <tr>
+            <th>Papel</th>
+            <th>Quantidade</th>
+            <th>Preço médio</th>
+            <th>Cotação</th>
+            <th>Valor inicial</th>
+            <th>Valor atual</th>
+            <th>Variação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% current_session.assets.where(asset_class: asset_class).order(:name).each do |asset| %>
+            <%
+              value         += asset.value
+              current_value += asset.current_value
+            %>
+            <tr>
+              <td><%= asset.name %></td>
+              <td><%= number_with_delimiter asset.quantity %></td>
+              <td><%= number_to_currency asset.price %></td>
+              <td><%= number_to_currency asset.current_price %></td>
+              <td><%= number_to_currency asset.value %></td>
+              <td><%= number_to_currency asset.current_value %></td>
+              <td><%= number_to_percentage(asset.current_value/asset.value - 1) if asset.value > 0 %> <small>(<%= number_to_currency asset.current_value - asset.value %>)</small></td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot class="thead-dark">
+          <th>Total</th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th><%= number_to_currency value %></th>
+          <th><%= number_to_currency current_value %></th>
+          <th><%= number_to_percentage(current_value/value - 1) if value > 0 %> <small>(<%= number_to_currency current_value - value %>)</small></th>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+<% end %>
