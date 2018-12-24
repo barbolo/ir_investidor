@@ -1,21 +1,21 @@
 class Order < ApplicationRecord
   belongs_to :session
 
-  ASSET_CLASS = {
-    'acao'       => 'ACAO',
-    'opcao'      => 'OPCAO',
-    'fii'        => 'FII',
-    'subscricao' => 'SUBSCRICAO',
-  }
-
   TYPE = {
     'compra'     => 'COMPRA',
     'venda'      => 'VENDA',
     'conversao'  => 'CONVERSAO',
   }
 
-  validates :asset_class, presence: true, inclusion: { in: ASSET_CLASS.values }
-  validates :order_type, presence: true, inclusion: { in: TYPE.values }
+  scope :order_by_type, -> { order(Arel.sql('CASE order_type
+    WHEN "CONVERSAO" THEN 0
+    WHEN "COMPRA"    THEN 1
+    WHEN "VENDA"     THEN 2
+    ELSE                  3
+    END')) }
+
+  validates :asset_class, presence: true, inclusion: { in: Asset::TYPE.values }
+  validates :order_type, presence: true, inclusion: { in: Order::TYPE.values }
   validates :name, presence: true
 
   with_options if: :compra_venda? do |order|

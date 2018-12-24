@@ -9,7 +9,8 @@ class OrderAfterCreateAllWorker
 
     session_orders_were_ready = ActiveRecord::Base.transaction do
       session = Session.where(id: session_id).take
-      if session.orders_ready
+
+      if session.nil? || session.orders_ready
         true
       else
         session.orders_ready = true

@@ -7,7 +7,7 @@ class AssetCalculateWorker
     return if session.nil? || session.assets.exists?
 
     calculator = AssetCalculator.new(session)
-    calculator.calculate
+    calculator.calculate_and_save
 
     session.calcs_ready  = true
     session.assets_value = session.assets.sum(:current_value)

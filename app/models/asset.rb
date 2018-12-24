@@ -1,7 +1,14 @@
 class Asset < ApplicationRecord
   belongs_to :session
 
-  validates :asset_class, presence: true, inclusion: { in: Order::ASSET_CLASS.values }
+  TYPE = {
+    'acao'       => 'ACAO',
+    'opcao'      => 'OPCAO',
+    'fii'        => 'FII',
+    'subscricao' => 'SUBSCRICAO',
+  }
+
+  validates :asset_class, presence: true, inclusion: { in: Asset::TYPE.values }
   validates :name, presence: true
   validates :quantity, presence: true, numericality: true
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }

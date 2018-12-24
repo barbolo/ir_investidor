@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
   resources :sessions, path: 'calculando', param: :secret, except: [:index, :edit, :update]
 
-  get ':secret/transacoes', to: 'transactions#list', as: :transactions_list
+  get 'operacoes/:secret', to: 'transactions#list', as: :transactions_list
 
   # Sidekiq Web UI
   mount Sidekiq::Web => '/sidekiq-admin'

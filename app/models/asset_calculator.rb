@@ -1,18 +1,26 @@
 class AssetCalculator
-  attr_accessor :session, :assets
+  TAX_ALIQUOT = {
+    'common'   => BigDecimal('0.15'),
+    'daytrade' => BigDecimal('0.20'),
+    'fii'      => BigDecimal('0.20'),
+  }
+
+  IRRF_ALIQUOT = {
+    'common'   => BigDecimal('0.15'),
+    'daytrade' => BigDecimal('0.20'),
+  }
+
+  attr_accessor :session, :logs, :assets, :tax
 
   def initialize(session)
-    self.session = session
-    self.assets = {
-      Order::ASSET_CLASS['acao']       => {},
-      Order::ASSET_CLASS['opcao']      => {},
-      Order::ASSET_CLASS['fii']        => {},
-      Order::ASSET_CLASS['subscricao'] => {},
-    }
+    self.session   = session
+    self.logs      = []
+    self.assets    = Asset::TYPE.values.map { |asset_class| [asset_class, {}] }.to_h
+    self.tax       = TaxCalculator.new(session, self)
   end
 
-  def calculate
-    session.orders.order(:ordered_at).each do |order|
+  def calculate_and_save
+    session.orders.order(:ordered_at).order_by_type.each do |order|
       case order.order_type
       when Order::TYPE['compra']
         compra(order)
@@ -23,6 +31,8 @@ class AssetCalculator
       end
     end
     save_assets
+    tax.calculate_and_save
+    save_logs
   end
 
   def save_assets
@@ -42,10 +52,15 @@ class AssetCalculator
           last_order_at:  asset_values['last_order_at'],
         )
         if asset.errors.any?
-          message = "Falha ao salvar posição em ativo. #{asset.errors.full_messages.join(', ')}"
-          SessionLogCreateWorker.perform_async(session.id, message)
+          logs << "Falha ao salvar posição em ativo. #{asset.errors.full_messages.join(', ')}"
         end
       end
+    end
+  end
+
+  def save_logs
+    (logs + tax.logs).sort.uniq.each do |log|
+      SessionLog.create!(session_id: session.id, message: log)
     end
   end
 
@@ -59,19 +74,24 @@ class AssetCalculator
 
     elsif order.quantity <= asset['quantity'].abs
       # reduce short allocation
+      tax.add_entry(order, asset)
       asset['quantity']       += order.quantity
 
     else
       # from short to long
+      tax.add_entry(order, asset)
       asset['quantity']       += order.quantity
       asset['price']          = order.price_considering_costs
     end
 
     asset['last_order_at']    = order.ordered_at
+
+    tax.add_trade(order)
   end
 
   def venda(order)
     asset = asset_for(order)
+    tax.tax_for(order, asset)[0]['sales'] += (order.quantity * order.price)
 
     if asset['quantity'] <= 0
       # increase short allocation
@@ -80,15 +100,19 @@ class AssetCalculator
 
     elsif order.quantity <= asset['quantity']
       # reduce long allocation
+      tax.add_entry(order, asset)
       asset['quantity']       -= order.quantity
 
     else
       # from long to short
+      tax.add_entry(order, asset)
       asset['quantity']       -= order.quantity
       asset['price']          = order.price_considering_costs
     end
 
     asset['last_order_at']    = order.ordered_at
+
+    tax.add_trade(order)
   end
 
   def conversao(order)

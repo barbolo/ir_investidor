@@ -75,7 +75,7 @@ class SheetParseWorker
       'row'           => row_index,
       'asset_class'   => parse_cell(row[headers['ATIVO']]).try(:upcase),
       'order_type'    => parse_cell(row[headers['OPERACAO']]).try(:upcase),
-      'daytrade'      => parse_boolean(row[headers['DAYTRADE?']]).try(:upcase),
+      'daytrade'      => parse_boolean(row[headers['DAYTRADE?']]),
       'name'          => parse_cell(row[headers['PAPEL']]).try(:upcase),
       'quantity'      => parse_number(row[headers['QTD']]),
       'price'         => parse_number(row[headers['PRECO']]),
@@ -113,7 +113,7 @@ class SheetParseWorker
     return nil if cell.nil?
     case cell.class.to_s
     when /Roo\:\:Excelx/
-      cell.value
+      cell.value.to_s.upcase == 'S'
     else
       cell.to_s.upcase == 'S'
     end

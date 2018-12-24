@@ -5,7 +5,7 @@ class OrderCreateWorker
   def perform(attributes)
     order = Order.create(attributes)
     if order.errors.any?
-      message = "Operação da linha #{attributes['row']} descartada. #{order.errors.full_messages.join(', ')}"
+      message = "Linha #{attributes['row']}. Operação descartada. #{order.errors.full_messages.join(', ')}."
       SessionLogCreateWorker.perform_async(attributes['session_id'], message)
     end
 

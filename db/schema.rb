@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_15_150421) do
+ActiveRecord::Schema.define(version: 2018_12_21_185936) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -92,7 +92,71 @@ ActiveRecord::Schema.define(version: 2018_12_15_150421) do
     t.index ["secret"], name: "index_sessions_on_secret", unique: true
   end
 
+  create_table "tax_entries", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "tax_id"
+    t.string "asset_class"
+    t.string "name"
+    t.boolean "daytrade"
+    t.decimal "tax_aliquot", precision: 10, scale: 6, unsigned: true
+    t.decimal "irrf_aliquot", precision: 10, scale: 6, unsigned: true
+    t.decimal "earnings", precision: 10, scale: 2
+    t.decimal "tax_due", precision: 10, scale: 2, unsigned: true
+    t.decimal "irrf", precision: 10, scale: 2, unsigned: true
+    t.datetime "disposed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tax_id", "asset_class", "disposed_at"], name: "index_tax_entries_on_tax_id_and_asset_class_and_disposed_at"
+  end
+
+  create_table "taxes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "session_id"
+    t.date "period"
+    t.decimal "darf", precision: 10, scale: 2, unsigned: true
+    t.decimal "tax_due", precision: 10, scale: 2, unsigned: true
+    t.decimal "irrf", precision: 10, scale: 2, unsigned: true
+    t.decimal "irrf_before", precision: 10, scale: 2, unsigned: true
+    t.decimal "irrf_after", precision: 10, scale: 2, unsigned: true
+    t.decimal "stocks_sales", precision: 10, scale: 2, unsigned: true
+    t.decimal "stocks_taxfree_profits", precision: 10, scale: 2, unsigned: true
+    t.decimal "common_tax_aliquot", precision: 10, scale: 6, unsigned: true
+    t.decimal "common_irrf_aliquot", precision: 10, scale: 6, unsigned: true
+    t.decimal "common_stocks_earnings", precision: 10, scale: 2
+    t.decimal "common_options_earnings", precision: 10, scale: 2
+    t.decimal "common_subscriptions_earnings", precision: 10, scale: 2
+    t.decimal "common_earnings", precision: 10, scale: 2
+    t.decimal "common_sales", precision: 10, scale: 2, unsigned: true
+    t.decimal "common_losses_before", precision: 10, scale: 2, unsigned: true
+    t.decimal "common_taxable_value", precision: 10, scale: 2, unsigned: true
+    t.decimal "common_losses_after", precision: 10, scale: 2, unsigned: true
+    t.decimal "common_tax_due", precision: 10, scale: 2, unsigned: true
+    t.decimal "common_irrf", precision: 10, scale: 2, unsigned: true
+    t.decimal "daytrade_tax_aliquot", precision: 10, scale: 6, unsigned: true
+    t.decimal "daytrade_irrf_aliquot", precision: 10, scale: 6, unsigned: true
+    t.decimal "daytrade_stocks_earnings", precision: 10, scale: 2
+    t.decimal "daytrade_options_earnings", precision: 10, scale: 2
+    t.decimal "daytrade_earnings", precision: 10, scale: 2
+    t.decimal "daytrade_sales", precision: 10, scale: 2, unsigned: true
+    t.decimal "daytrade_losses_before", precision: 10, scale: 2, unsigned: true
+    t.decimal "daytrade_taxable_value", precision: 10, scale: 2, unsigned: true
+    t.decimal "daytrade_losses_after", precision: 10, scale: 2, unsigned: true
+    t.decimal "daytrade_tax_due", precision: 10, scale: 2, unsigned: true
+    t.decimal "daytrade_irrf", precision: 10, scale: 2, unsigned: true
+    t.decimal "fii_tax_aliquot", precision: 10, scale: 6, unsigned: true
+    t.decimal "fii_earnings", precision: 10, scale: 2
+    t.decimal "fii_sales", precision: 10, scale: 2, unsigned: true
+    t.decimal "fii_losses_before", precision: 10, scale: 2, unsigned: true
+    t.decimal "fii_taxable_value", precision: 10, scale: 2, unsigned: true
+    t.decimal "fii_losses_after", precision: 10, scale: 2, unsigned: true
+    t.decimal "fii_tax_due", precision: 10, scale: 2, unsigned: true
+    t.decimal "fii_irrf", precision: 10, scale: 2, unsigned: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["session_id", "period"], name: "index_taxes_on_session_id_and_period"
+  end
+
   add_foreign_key "assets", "sessions"
   add_foreign_key "orders", "sessions"
   add_foreign_key "session_logs", "sessions"
+  add_foreign_key "tax_entries", "taxes"
+  add_foreign_key "taxes", "sessions"
 end

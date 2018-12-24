@@ -3,6 +3,7 @@ class Session < ApplicationRecord
   has_many :session_logs, dependent: :destroy
   has_many :orders, dependent: :destroy
   has_many :assets, dependent: :destroy
+  has_many :taxes, dependent: :destroy
 
   validate :validate_sheet
 
