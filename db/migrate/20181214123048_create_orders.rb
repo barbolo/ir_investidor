@@ -16,6 +16,10 @@ class CreateOrders < ActiveRecord::Migration[5.2]
       t.string :new_name
       t.decimal :old_quantity, precision: 10, scale: 2, unsigned: true
       t.decimal :new_quantity, precision: 10, scale: 2, unsigned: true
+      t.decimal :accumulated_common, precision: 10, scale: 2, unsigned: true
+      t.decimal :accumulated_daytrade, precision: 10, scale: 2, unsigned: true
+      t.decimal :accumulated_fii, precision: 10, scale: 2, unsigned: true
+      t.decimal :accumulated_irrf, precision: 10, scale: 2, unsigned: true
 
       t.timestamps
 

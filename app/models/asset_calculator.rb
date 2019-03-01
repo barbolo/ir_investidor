@@ -28,6 +28,8 @@ class AssetCalculator
         venda(order)
       when Order::TYPE['conversao']
         conversao(order)
+      when Order::TYPE['compensacao']
+        compensacao(order)
       end
     end
     save_assets
@@ -133,6 +135,15 @@ class AssetCalculator
     new_asset['price']         = (new_asset['quantity']*new_asset['price'] + quantity * price)/(new_asset['quantity'] + quantity)
     new_asset['quantity']      += quantity
     new_asset['last_order_at'] = [asset['last_order_at'], new_asset['last_order_at']].max
+  end
+
+  def compensacao(order)
+    tax.compensacoes[order.ordered_at.beginning_of_month] = {
+      'common'   => order.accumulated_common,
+      'daytrade' => order.accumulated_daytrade,
+      'fii'      => order.accumulated_fii,
+      'irrf'     => order.accumulated_irrf,
+    }
   end
 
   private

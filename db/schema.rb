@@ -65,6 +65,10 @@ ActiveRecord::Schema.define(version: 2018_12_21_185936) do
     t.string "new_name"
     t.decimal "old_quantity", precision: 10, scale: 2, unsigned: true
     t.decimal "new_quantity", precision: 10, scale: 2, unsigned: true
+    t.decimal "accumulated_common", precision: 10, scale: 2, unsigned: true
+    t.decimal "accumulated_daytrade", precision: 10, scale: 2, unsigned: true
+    t.decimal "accumulated_fii", precision: 10, scale: 2, unsigned: true
+    t.decimal "accumulated_irrf", precision: 10, scale: 2, unsigned: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["session_id", "ordered_at"], name: "index_orders_on_session_id_and_ordered_at"

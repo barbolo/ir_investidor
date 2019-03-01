@@ -46,7 +46,7 @@
                 <i class="fas fa-chart-pie"></i> Posições</a>
               <% end %>
             </li>
-            <li class="nav-item <%= 'active' if controller_name == 'todo' %>">
+            <li class="nav-item <%= 'active' if controller_name == 'taxes' %>">
               <%= link_to taxes_path(period: Date.today.beginning_of_month), class: 'nav-link' do %>
                 <i class="fas fa-money-bill"></i> Impostos</a>
               <% end %>

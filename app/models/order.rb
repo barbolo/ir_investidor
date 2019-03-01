@@ -2,21 +2,27 @@ class Order < ApplicationRecord
   belongs_to :session
 
   TYPE = {
-    'compra'     => 'COMPRA',
-    'venda'      => 'VENDA',
-    'conversao'  => 'CONVERSAO',
+    'compra'      => 'COMPRA',
+    'venda'       => 'VENDA',
+    'conversao'   => 'CONVERSAO',
+    'compensacao' => 'COMPENSACAO',
   }
 
   scope :order_by_type, -> { order(Arel.sql('CASE order_type
-    WHEN "CONVERSAO" THEN 0
-    WHEN "COMPRA"    THEN 1
-    WHEN "VENDA"     THEN 2
-    ELSE                  3
+    WHEN "COMPENSACAO" THEN 0
+    WHEN "CONVERSAO"   THEN 1
+    WHEN "COMPRA"      THEN 2
+    WHEN "VENDA"       THEN 3
+    ELSE                    4
     END')) }
 
-  validates :asset_class, presence: true, inclusion: { in: Asset::TYPE.values }
   validates :order_type, presence: true, inclusion: { in: Order::TYPE.values }
-  validates :name, presence: true
+  validates :ordered_at, presence: true, inclusion: { in: (Date.today - 20.years)..Date.today.end_of_month }
+
+  with_options unless: :compensacao? do |order|
+    order.validates :asset_class, presence: true, inclusion: { in: Asset::TYPE.values }
+    order.validates :name, presence: true
+  end
 
   with_options if: :compra_venda? do |order|
     order.validates :daytrade, exclusion: { in: [nil] }
@@ -24,7 +30,6 @@ class Order < ApplicationRecord
     order.validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
     order.validates :costs, presence: true, numericality: { greater_than_or_equal_to: 0 }
     order.validates :irrf, presence: true, numericality: { greater_than_or_equal_to: 0 }
-    order.validates :ordered_at, presence: true, inclusion: { in: (Date.today - 20.years)..Date.today.end_of_month }
     order.validates :settlement_at, presence: true, inclusion: { in: (Date.today - 20.years)..(Date.today.end_of_month + 10.days) }
   end
 
@@ -32,6 +37,13 @@ class Order < ApplicationRecord
     order.validates :new_name, presence: true
     order.validates :old_quantity, presence: true, numericality: { greater_than: 0 }
     order.validates :new_quantity, presence: true, numericality: { greater_than: 0 }
+  end
+
+  with_options if: :compensacao? do |order|
+    order.validates :accumulated_common, presence: true, numericality: { greater_than_or_equal_to: 0 }
+    order.validates :accumulated_daytrade, presence: true, numericality: { greater_than_or_equal_to: 0 }
+    order.validates :accumulated_fii, presence: true, numericality: { greater_than_or_equal_to: 0 }
+    order.validates :accumulated_irrf, presence: true, numericality: { greater_than_or_equal_to: 0 }
   end
 
   def price_considering_costs
@@ -52,5 +64,9 @@ class Order < ApplicationRecord
 
     def conversao?
       Order::TYPE['conversao'] == order_type
+    end
+
+    def compensacao?
+      Order::TYPE['compensacao'] == order_type
     end
 end

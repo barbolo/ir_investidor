@@ -10,13 +10,14 @@ class TaxCalculator
     'daytrade' => BigDecimal('0.01'),
   }
 
-  attr_accessor :session, :trades, :logs, :taxes
+  attr_accessor :session, :trades, :logs, :taxes, :compensacoes
 
   def initialize(session, trades)
-    self.session = session
-    self.trades  = {}
-    self.logs    = []
-    self.taxes   = {}
+    self.session      = session
+    self.trades       = {}
+    self.logs         = []
+    self.taxes        = {}
+    self.compensacoes = {}
   end
 
   def add_entry(order, asset)
@@ -70,6 +71,16 @@ class TaxCalculator
 
     period, _ = taxes.sort_by { |period, _| period }.first
     while period <= Date.today
+      if (compensacao           = compensacoes[period])
+        accumulated['common']   = compensacao['common']
+        accumulated['daytrade'] = compensacao['daytrade']
+        accumulated['fii']      = compensacao['fii']
+        accumulated['irrf']     = compensacao['irrf']
+      end
+
+      # IRRF acumulado de um ano não pode ser compensado no ano seguinte
+      accumulated['irrf'] = 0 if period.month == 1
+
       tax_period = taxes[period]
 
       tax = Tax.new
