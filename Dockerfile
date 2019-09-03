@@ -15,6 +15,9 @@ RUN apt-get install -y mysql-client default-libmysqlclient-dev
 # for nokogiri
 RUN apt-get install -y zlib1g-dev liblzma-dev
 
+# for pdftohtml
+RUN apt-get install -y -q --no-install-recommends poppler-utils
+
 # add app directory
 ENV APP_HOME /ir_investidor
 RUN mkdir $APP_HOME
