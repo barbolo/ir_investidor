@@ -6,14 +6,18 @@ class Order < ApplicationRecord
     'venda'       => 'VENDA',
     'conversao'   => 'CONVERSAO',
     'compensacao' => 'COMPENSACAO',
+    'isencao'     => 'ISENCAO',
+    'semisencao'  => 'SEMISENCAO',
   }
 
   scope :order_by_type, -> { order(Arel.sql('CASE order_type
     WHEN "COMPENSACAO" THEN 0
     WHEN "CONVERSAO"   THEN 1
-    WHEN "COMPRA"      THEN 2
-    WHEN "VENDA"       THEN 3
-    ELSE                    4
+    WHEN "ISENCAO"     THEN 2
+    WHEN "SEMISENCAO"  THEN 3
+    WHEN "COMPRA"      THEN 4
+    WHEN "VENDA"       THEN 5
+    ELSE                    6
     END')) }
 
   validates :order_type, presence: true, inclusion: { in: Order::TYPE.values }

@@ -10,7 +10,7 @@ class TaxCalculator
     'daytrade' => BigDecimal('0.01'),
   }
 
-  attr_accessor :session, :trades, :logs, :taxes, :compensacoes
+  attr_accessor :session, :trades, :logs, :taxes, :compensacoes, :isencoes
 
   def initialize(session, trades)
     self.session      = session
@@ -18,6 +18,7 @@ class TaxCalculator
     self.logs         = []
     self.taxes        = {}
     self.compensacoes = {}
+    self.isencoes     = {}
   end
 
   def add_entry(order, asset)
@@ -41,13 +42,24 @@ class TaxCalculator
     entry['tax_due']      = (entry['earnings'] > 0 ? entry['earnings'] * entry['tax_aliquot'] : 0)
     entry['disposed_at']  = order.ordered_at
 
+    # isenção
+    isenta = isencoes["#{order.asset_class}-#{order.name}"] &&
+             common_daytrade == 'common' &&
+             entry['earnings'] > 0
+    if isenta
+      entry['tax_aliquot']  = 0
+      entry['irrf_aliquot'] = 0
+      entry['tax_due']      = 0
+      entry['irrf']         = 0
+    end
+
     # generate logs
     if (entry['irrf'] - order.irrf).abs > 0.01
       logs << "Linha #{order.row}. IRRF informado: #{order.irrf.round(2)}. IRRF calculado: #{entry['irrf'].round(2)}. Calculamos os impostos com o IRRF calculado."
     end
 
     # save tax entry
-    tax['earnings'] += entry['earnings']
+    tax['earnings'] += entry['earnings'] if !isenta
     tax['entries']  << entry
   end
 

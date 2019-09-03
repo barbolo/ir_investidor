@@ -30,6 +30,10 @@ class AssetCalculator
         conversao(order)
       when Order::TYPE['compensacao']
         compensacao(order)
+      when Order::TYPE['isencao']
+        isencao(order)
+      when Order::TYPE['semisencao']
+        semisencao(order)
       end
     end
     save_assets
@@ -144,6 +148,14 @@ class AssetCalculator
       'fii'      => order.accumulated_fii,
       'irrf'     => order.accumulated_irrf,
     }
+  end
+
+  def isencao(order)
+    tax.isencoes["#{order.asset_class}-#{order.name}"] = true
+  end
+
+  def semisencao(order)
+    tax.isencoes.delete("#{order.asset_class}-#{order.name}")
   end
 
   private
