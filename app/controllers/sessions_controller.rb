@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
   skip_before_action :authenticate!, only: [:new, :create]
 
   def show
-    if current_session&.assets_value.to_f > 0
+    if current_session&.orders_ready
       redirect_to transactions_path(secret: params[:secret])
     end
   end
