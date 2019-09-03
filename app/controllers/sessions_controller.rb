@@ -3,6 +3,9 @@ class SessionsController < ApplicationController
   skip_before_action :authenticate!, only: [:new, :create]
 
   def show
+    if current_session&.assets_value.to_f > 0
+      redirect_to transactions_path(secret: params[:secret])
+    end
   end
 
   def new
@@ -20,8 +23,8 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    current_session.destroy
-    redirect_to root_path, notice: "Sua sessão foi encerrada e todos os dados de suas operações foram removidos. Até breve!"
+    SessionExpireWorker.perform_async(current_session.id)
+    redirect_to root_path, notice: "Sua sessão foi encerrada e os dados de suas operações removidos. Até breve!"
   end
 
   private
