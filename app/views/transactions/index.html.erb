@@ -33,8 +33,8 @@
             <td><%= number_to_currency order.price %></td>
             <td><%= number_to_currency order.costs %></td>
             <td><%= number_to_currency order.irrf %></td>
-            <td><%= l(order.ordered_at, format: :short) if order.ordered_at%></td>
-            <td><%= l(order.settlement_at, format: :short) if order.settlement_at%></td>
+            <td><%= l(order.ordered_at) if order.ordered_at%></td>
+            <td><%= l(order.settlement_at) if order.settlement_at%></td>
             <td><%= order.new_name %></td>
             <td><%= number_with_delimiter order.old_quantity %></td>
             <td><%= number_with_delimiter order.new_quantity %></td>
