@@ -146,15 +146,17 @@ pages.each_with_index do |page, i|
       empresa = row[/(VISTA|FRACIONARIO|[0-9]{2}\/[0-9]{2})\s+(.+)\s+(ON|PN|CI|UNT)/i, 2]
       empresa = empresa.split(/\s/).last.to_s if empresa.to_s.match(/\AFII/i)
       papel   = MAPA_PAPEIS[empresa] || empresa
-      numeros = row[/\s+[0-9,.]+\s+[0-9,.]+\s+[0-9,.]+/, 0].split(/\s+/).map { |num| num.gsub('.', '') }.find_all { |s| s.size > 0 }
+      com_obs = row[/\s+[0-9,.]+\s+[0-9,.]+\s+[0-9,.]+\s+[0-9,.]+/, 0]
+      sem_obs = row[/\s+[0-9,.]+\s+[0-9,.]+\s+[0-9,.]+/, 0]
+      numeros = (com_obs || sem_obs).split(/\s+/).map { |num| num.gsub('.', '') }.find_all { |s| s.size > 0 }
       operacao = {}
       operacao['DATA OPERACAO']   = data_operacao
       operacao['DATA LIQUIDACAO'] = data_liquidacao
       operacao['ATIVO']           = ativo
       operacao['OPERACAO']        = row[/BOVESPA C /i] ? 'COMPRA' : 'VENDA'
       operacao['DAYTRADE?']       = 'N'
-      operacao['QTD']             = numeros[0].to_i
-      operacao['PRECO']           = numeros[1]
+      operacao['QTD']             = com_obs ? numeros[1].to_i : numeros[0].to_i
+      operacao['PRECO']           = com_obs ? numeros[2] : numeros[1]
       operacoes[papel] ||= []
       operacoes[papel] << operacao
     end
