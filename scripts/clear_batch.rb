@@ -143,67 +143,77 @@ def parse_pdf(path)
         operacao['DAYTRADE?']       = 'N'
         operacao['QTD']             = numeros[0].to_i
         operacao['PRECO']           = numeros[1]
-        operacoes[papel] ||= []
-        operacoes[papel] << operacao
+        data_operacao_date = Date.strptime(data_operacao, '%d/%m/%Y')
+        operacoes[data_operacao_date] ||= {}
+        operacoes[data_operacao_date][papel] ||= []
+        operacoes[data_operacao_date][papel] << operacao
       end
     end
   end
 
   # reduce operations by grouping with the same price
-  operacoes.each do |papel, ops|
-    ops.each do |operacao|
-      next if operacao['_SHOULD_REMOVE']
-      ops.each do |op|
-        next if operacao.equal?(op)
-        if operacao['DATA LIQUIDACAO'] == op['DATA LIQUIDACAO'] &&
-           operacao['OPERACAO'] == op['OPERACAO'] &&
-           operacao['PRECO'] == op['PRECO']
-           operacao['QTD'] += op['QTD']
-           op['_SHOULD_REMOVE'] = true
+  operacoes.each do |data_operacao, operacoes_na_data|
+    operacoes_na_data.each do |papel, ops|
+      ops.each do |operacao|
+        next if operacao['_SHOULD_REMOVE']
+        ops.each do |op|
+          next if operacao.equal?(op)
+          if operacao['DATA LIQUIDACAO'] == op['DATA LIQUIDACAO'] &&
+             operacao['OPERACAO'] == op['OPERACAO'] &&
+             operacao['PRECO'] == op['PRECO']
+             operacao['QTD'] += op['QTD']
+             op['_SHOULD_REMOVE'] = true
+          end
         end
       end
+      ops.delete_if { |operacao| operacao['_SHOULD_REMOVE'] }
     end
-    ops.delete_if { |operacao| operacao['_SHOULD_REMOVE'] }
   end
 
   # find daytrades
-  operacoes.keys.each do |papel|
-    ops = operacoes[papel]
-    compras = ops.find_all { |op| op['OPERACAO'] == 'COMPRA' }
-    vendas  = ops.find_all { |op| op['OPERACAO'] == 'VENDA' }
-    compra = compras.sum { |op| op['QTD'] }
-    venda  = vendas.sum { |op| op['QTD'] }
-    if compra > 0 && venda > 0
-      preco_compra = compras.sum { |op| op['QTD'] * op['PRECO'].gsub(',', '.').to_f } / compra
-      preco_venda  = vendas.sum { |op| op['QTD'] * op['PRECO'].gsub(',', '.').to_f } / venda
-      operacao_proto = compras.first
-      ops = []
-      if compra > venda
-        ops << operacao_proto.merge('OPERACAO' => 'COMPRA', 'QTD' => compra - venda, 'PRECO' => ('%.2f' % preco_compra).gsub('.', ','), 'DAYTRADE?' => 'N')
-        ops << operacao_proto.merge('OPERACAO' => 'COMPRA', 'QTD' => venda, 'PRECO' => ('%.2f' % preco_compra).gsub('.', ','), 'DAYTRADE?' => 'S')
-        ops << operacao_proto.merge('OPERACAO' => 'VENDA', 'QTD' => venda, 'PRECO' => ('%.2f' % preco_venda).gsub('.', ','), 'DAYTRADE?' => 'S')
-      else
-        ops << operacao_proto.merge('OPERACAO' => 'VENDA', 'QTD' => venda - compra, 'PRECO' => ('%.2f' % preco_venda).gsub('.', ','), 'DAYTRADE?' => 'N')
-        ops << operacao_proto.merge('OPERACAO' => 'VENDA', 'QTD' => compra, 'PRECO' => ('%.2f' % preco_venda).gsub('.', ','), 'DAYTRADE?' => 'S')
-        ops << operacao_proto.merge('OPERACAO' => 'COMPRA', 'QTD' => compra, 'PRECO' => ('%.2f' % preco_compra).gsub('.', ','), 'DAYTRADE?' => 'S')
+  operacoes.keys.each do |data_operacao|
+    operacoes_na_data = operacoes[data_operacao]
+    operacoes_na_data.keys.each do |papel|
+      ops = operacoes_na_data[papel]
+      compras = ops.find_all { |op| op['OPERACAO'] == 'COMPRA' }
+      vendas  = ops.find_all { |op| op['OPERACAO'] == 'VENDA' }
+      compra = compras.sum { |op| op['QTD'] }
+      venda  = vendas.sum { |op| op['QTD'] }
+      if compra > 0 && venda > 0
+        preco_compra = compras.sum { |op| op['QTD'] * op['PRECO'].gsub(',', '.').to_f } / compra
+        preco_venda  = vendas.sum { |op| op['QTD'] * op['PRECO'].gsub(',', '.').to_f } / venda
+        operacao_proto = compras.first
+        ops = []
+        if compra > venda
+          ops << operacao_proto.merge('OPERACAO' => 'COMPRA', 'QTD' => compra - venda, 'PRECO' => ('%.2f' % preco_compra).gsub('.', ','), 'DAYTRADE?' => 'N')
+          ops << operacao_proto.merge('OPERACAO' => 'COMPRA', 'QTD' => venda, 'PRECO' => ('%.2f' % preco_compra).gsub('.', ','), 'DAYTRADE?' => 'S')
+          ops << operacao_proto.merge('OPERACAO' => 'VENDA', 'QTD' => venda, 'PRECO' => ('%.2f' % preco_venda).gsub('.', ','), 'DAYTRADE?' => 'S')
+        else
+          ops << operacao_proto.merge('OPERACAO' => 'VENDA', 'QTD' => venda - compra, 'PRECO' => ('%.2f' % preco_venda).gsub('.', ','), 'DAYTRADE?' => 'N')
+          ops << operacao_proto.merge('OPERACAO' => 'VENDA', 'QTD' => compra, 'PRECO' => ('%.2f' % preco_venda).gsub('.', ','), 'DAYTRADE?' => 'S')
+          ops << operacao_proto.merge('OPERACAO' => 'COMPRA', 'QTD' => compra, 'PRECO' => ('%.2f' % preco_compra).gsub('.', ','), 'DAYTRADE?' => 'S')
+        end
+        operacoes_na_data[papel] = ops
       end
-      operacoes[papel] = ops
     end
   end
 
   final_rows = []
-  operacoes.each do |papel, ops|
-    ops.each do |op|
-      final_rows << [
-        op['DATA OPERACAO'],
-        op['DATA LIQUIDACAO'],
-        op['ATIVO'],
-        op['OPERACAO'],
-        op['DAYTRADE?'],
-        papel,
-        op['QTD'],
-        op['PRECO'],
-      ]
+  operacoes.keys.sort.each do |data_operacao|
+    operacoes_na_data = operacoes[data_operacao]
+    operacoes_na_data.each do |papel, ops|
+      ops.each do |op|
+        final_rows << [
+          op['DATA OPERACAO'],
+          op['DATA LIQUIDACAO'],
+          op['ATIVO'],
+          op['OPERACAO'],
+          op['DAYTRADE?'],
+          papel,
+          op['QTD'],
+          op['PRECO'],
+        ]
+      end
     end
   end
 
