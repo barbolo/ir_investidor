@@ -75,23 +75,31 @@ class TaxCalculator
 
   def calculate_and_save
     accumulated = {
-      'common'   => 0,
-      'daytrade' => 0,
-      'fii'      => 0,
-      'irrf'     => 0,
+      'common'        => 0,
+      'daytrade'      => 0,
+      'fii'           => 0,
+      'irrf_common'   => 0,
+      'irrf_daytrade' => 0,
+      'irrf_fii'      => 0,
     }
 
     period, _ = taxes.sort_by { |period, _| period }.first
     while period <= Date.today
-      if (compensacao           = compensacoes[period])
-        accumulated['common']   = compensacao['common']
-        accumulated['daytrade'] = compensacao['daytrade']
-        accumulated['fii']      = compensacao['fii']
-        accumulated['irrf']     = compensacao['irrf']
+      if (compensacao = compensacoes[period])
+        accumulated['common']        = compensacao['common']
+        accumulated['daytrade']      = compensacao['daytrade']
+        accumulated['fii']           = compensacao['fii']
+        accumulated['irrf_common']   = compensacao['irrf_common']
+        accumulated['irrf_daytrade'] = compensacao['irrf_daytrade']
+        accumulated['irrf_fii']      = compensacao['irrf_fii']
       end
 
       # IRRF acumulado de um ano não pode ser compensado no ano seguinte
-      accumulated['irrf'] = 0 if period.month == 1
+      if period.month == 1
+        accumulated['irrf_common']   = 0
+        accumulated['irrf_daytrade'] = 0
+        accumulated['irrf_fii']      = 0
+      end
 
       tax_period = taxes[period]
 
@@ -138,7 +146,6 @@ class TaxCalculator
           tax.common_losses_after   = 0
           tax.common_tax_due        = tax.common_taxable_value * tax.common_tax_aliquot
         end
-        accumulated['common']       = tax.common_losses_after
 
         # OPERAÇÕES DAY-TRADE
         tax.daytrade_stocks_earnings  = acao['daytrade']['earnings']
@@ -156,7 +163,32 @@ class TaxCalculator
           tax.daytrade_losses_after   = 0
           tax.daytrade_tax_due        = tax.daytrade_taxable_value * tax.daytrade_tax_aliquot
         end
-        accumulated['daytrade']       = tax.daytrade_losses_after
+
+        # CALCULATE DARF FOR COMMON AND DAY-TRADE
+        daytrade_irrf = tax.daytrade_irrf + accumulated['irrf_daytrade']
+        common_irrf   = tax.common_irrf + accumulated['irrf_common']
+        tax.common_daytrade_darf = tax.common_tax_due + tax.daytrade_tax_due
+
+        if tax.common_daytrade_darf > 0
+          discount = tax.common_daytrade_darf > daytrade_irrf ? daytrade_irrf : tax.common_daytrade_darf
+          tax.daytrade_irrf_after   = daytrade_irrf - discount
+          tax.common_daytrade_darf -= discount
+
+          discount = tax.common_daytrade_darf > common_irrf ? common_irrf : tax.common_daytrade_darf
+          tax.common_irrf_after     = common_irrf - discount
+          tax.common_daytrade_darf -= discount
+        else
+          tax.daytrade_irrf_after = daytrade_irrf
+          tax.common_irrf_after   = common_irrf
+        end
+
+        tax.daytrade_irrf_before     = accumulated['irrf_daytrade']
+        accumulated['irrf_daytrade'] = tax.daytrade_irrf_after
+        accumulated['daytrade']      = tax.daytrade_losses_after
+
+        tax.common_irrf_before     = accumulated['irrf_common']
+        accumulated['irrf_common'] = tax.common_irrf_after
+        accumulated['common']      = tax.common_losses_after
 
         # FII
         tax.fii_earnings         = fii['common']['earnings'] + fii['daytrade']['earnings']
@@ -172,29 +204,28 @@ class TaxCalculator
           tax.fii_losses_after   = 0
           tax.fii_tax_due        = tax.fii_taxable_value * tax.fii_tax_aliquot
         end
-        accumulated['fii']       = tax.fii_losses_after
+
+        # CALCULATE DARF FOR FII
+        accumulated_irrf = tax.fii_irrf + accumulated['irrf_fii']
+        if tax.fii_tax_due > 0
+          irrf_discount       = [accumulated_irrf, tax.fii_tax_due].min
+          tax.fii_irrf_after = accumulated_irrf - irrf_discount
+          tax.fii_darf       = tax.fii_tax_due - irrf_discount
+        else
+          tax.fii_irrf_after = accumulated_irrf
+          tax.fii_darf       = 0
+        end
+        tax.fii_irrf_before     = accumulated['irrf_fii']
+        accumulated['irrf_fii'] = tax.fii_irrf_after
+        accumulated['fii']      = tax.fii_losses_after
 
         # TOTAL
-        tax.tax_due      = tax.common_tax_due + tax.daytrade_tax_due + tax.fii_tax_due
-        tax.irrf         = tax.common_irrf + tax.daytrade_irrf + tax.fii_irrf
-        tax.irrf_before  = accumulated['irrf']
-        accumulated_irrf = tax.irrf + tax.irrf_before
-        if tax.tax_due > 0
-          irrf_discount  = [accumulated_irrf, tax.tax_due].min
-          tax.irrf_after = accumulated_irrf - irrf_discount
-          tax.darf       = tax.tax_due - irrf_discount
-        else
-          tax.irrf_after = accumulated_irrf
-          tax.darf = 0
-        end
-        accumulated['irrf'] = tax.irrf_after
+        tax.darf = tax.common_daytrade_darf + tax.fii_darf
 
       else
         tax.darf                          = 0
-        tax.tax_due                       = 0
-        tax.irrf                          = 0
-        tax.irrf_before                   = accumulated['irrf']
-        tax.irrf_after                    = accumulated['irrf']
+        tax.common_daytrade_darf          = 0
+        tax.fii_darf                      = 0
         tax.stocks_sales                  = 0
         tax.stocks_taxfree_profits        = 0
         tax.common_stocks_earnings        = 0
@@ -207,6 +238,8 @@ class TaxCalculator
         tax.common_losses_after           = accumulated['common']
         tax.common_tax_due                = 0
         tax.common_irrf                   = 0
+        tax.common_irrf_before            = accumulated['irrf_common']
+        tax.common_irrf_after             = accumulated['irrf_common']
         tax.daytrade_stocks_earnings      = 0
         tax.daytrade_options_earnings     = 0
         tax.daytrade_earnings             = 0
@@ -216,6 +249,8 @@ class TaxCalculator
         tax.daytrade_losses_after         = accumulated['daytrade']
         tax.daytrade_tax_due              = 0
         tax.daytrade_irrf                 = 0
+        tax.daytrade_irrf_before          = accumulated['irrf_daytrade']
+        tax.daytrade_irrf_after           = accumulated['irrf_daytrade']
         tax.fii_earnings                  = 0
         tax.fii_sales                     = 0
         tax.fii_losses_before             = accumulated['fii']
@@ -223,6 +258,8 @@ class TaxCalculator
         tax.fii_losses_after              = accumulated['fii']
         tax.fii_tax_due                   = 0
         tax.fii_irrf                      = 0
+        tax.fii_irrf_before               = accumulated['irrf_fii']
+        tax.fii_irrf_after                = accumulated['irrf_fii']
       end
 
       tax.save!

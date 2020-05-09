@@ -4,6 +4,7 @@ class Session < ApplicationRecord
   has_many :orders, dependent: :destroy
   has_many :assets, dependent: :destroy
   has_many :taxes, dependent: :destroy
+  has_many :assets_end_of_years, dependent: :destroy
 
   validate :validate_sheet
 
@@ -32,7 +33,8 @@ class Session < ApplicationRecord
     end
 
     def destroy
-      ActiveStorage::Blob.where(key: sheet.key).take.try(:destroy) if sheet.attached?
+      sheet_key = sheet.key
       super
+      ActiveStorage::Blob.where(key: sheet_key).take&.destroy
     end
 end

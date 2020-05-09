@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_21_185936) do
+ActiveRecord::Schema.define(version: 2020_05_09_104732) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -47,6 +47,15 @@ ActiveRecord::Schema.define(version: 2018_12_21_185936) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["session_id", "asset_class", "name"], name: "index_assets_on_session_id_and_asset_class_and_name"
+  end
+
+  create_table "assets_end_of_years", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "session_id"
+    t.integer "year", limit: 2
+    t.json "assets"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["session_id", "year"], name: "index_assets_end_of_years_on_session_id_and_year"
   end
 
   create_table "orders", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -116,10 +125,8 @@ ActiveRecord::Schema.define(version: 2018_12_21_185936) do
     t.bigint "session_id"
     t.date "period"
     t.decimal "darf", precision: 10, scale: 2, unsigned: true
-    t.decimal "tax_due", precision: 10, scale: 2, unsigned: true
-    t.decimal "irrf", precision: 10, scale: 2, unsigned: true
-    t.decimal "irrf_before", precision: 10, scale: 2, unsigned: true
-    t.decimal "irrf_after", precision: 10, scale: 2, unsigned: true
+    t.decimal "common_daytrade_darf", precision: 10, scale: 2, unsigned: true
+    t.decimal "fii_darf", precision: 10, scale: 2, unsigned: true
     t.decimal "stocks_sales", precision: 10, scale: 2, unsigned: true
     t.decimal "stocks_taxfree_profits", precision: 10, scale: 2, unsigned: true
     t.decimal "common_tax_aliquot", precision: 10, scale: 6, unsigned: true
@@ -134,6 +141,8 @@ ActiveRecord::Schema.define(version: 2018_12_21_185936) do
     t.decimal "common_losses_after", precision: 10, scale: 2, unsigned: true
     t.decimal "common_tax_due", precision: 10, scale: 2, unsigned: true
     t.decimal "common_irrf", precision: 10, scale: 2, unsigned: true
+    t.decimal "common_irrf_before", precision: 10, scale: 2, unsigned: true
+    t.decimal "common_irrf_after", precision: 10, scale: 2, unsigned: true
     t.decimal "daytrade_tax_aliquot", precision: 10, scale: 6, unsigned: true
     t.decimal "daytrade_irrf_aliquot", precision: 10, scale: 6, unsigned: true
     t.decimal "daytrade_stocks_earnings", precision: 10, scale: 2
@@ -145,6 +154,8 @@ ActiveRecord::Schema.define(version: 2018_12_21_185936) do
     t.decimal "daytrade_losses_after", precision: 10, scale: 2, unsigned: true
     t.decimal "daytrade_tax_due", precision: 10, scale: 2, unsigned: true
     t.decimal "daytrade_irrf", precision: 10, scale: 2, unsigned: true
+    t.decimal "daytrade_irrf_before", precision: 10, scale: 2, unsigned: true
+    t.decimal "daytrade_irrf_after", precision: 10, scale: 2, unsigned: true
     t.decimal "fii_tax_aliquot", precision: 10, scale: 6, unsigned: true
     t.decimal "fii_earnings", precision: 10, scale: 2
     t.decimal "fii_sales", precision: 10, scale: 2, unsigned: true
@@ -153,12 +164,26 @@ ActiveRecord::Schema.define(version: 2018_12_21_185936) do
     t.decimal "fii_losses_after", precision: 10, scale: 2, unsigned: true
     t.decimal "fii_tax_due", precision: 10, scale: 2, unsigned: true
     t.decimal "fii_irrf", precision: 10, scale: 2, unsigned: true
+    t.decimal "fii_irrf_before", precision: 10, scale: 2, unsigned: true
+    t.decimal "fii_irrf_after", precision: 10, scale: 2, unsigned: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["session_id", "period"], name: "index_taxes_on_session_id_and_period"
   end
 
+  create_table "tickers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "ticker", limit: 20
+    t.string "cnpj", limit: 15
+    t.text "razao_social", limit: 255
+    t.text "trading_name", limit: 255
+    t.text "fake_fulltext_index"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ticker"], name: "index_tickers_on_ticker", unique: true
+  end
+
   add_foreign_key "assets", "sessions"
+  add_foreign_key "assets_end_of_years", "sessions"
   add_foreign_key "orders", "sessions"
   add_foreign_key "session_logs", "sessions"
   add_foreign_key "tax_entries", "taxes"

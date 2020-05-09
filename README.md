@@ -10,7 +10,7 @@ Em seu computador:
 docker-compose pull # faz o download das imagens de Docker
 docker-compose build # cria imagens de Docker do projeto
 docker-compose run web bundle install # instala gems do projeto
-docker-compose run web rake db:create db:migrate # cria e prepara o banco de dados
+docker-compose run web rake db:create db:migrate db:seed # cria e prepara o banco de dados
 
 # exeção da aplicação:
 docker-compose up

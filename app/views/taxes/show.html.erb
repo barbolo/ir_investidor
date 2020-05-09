@@ -103,20 +103,37 @@
             <td class="colorize-number"><%= number_to_currency @tax.fii_tax_due %></td>
           </tr>
           <tr>
-            <td>Imposto devido total</td>
-            <td colspan="3" class="text-center"><%= number_to_currency @tax.tax_due %></td>
-          </tr>
-          <tr>
             <td>Imposto retido (IRRF) meses anteriores</td>
-            <td colspan="3" class="text-center"><%= number_to_currency @tax.irrf_before %></td>
+            <td><%= number_to_currency @tax.common_irrf_before %></td>
+            <td><%= number_to_currency @tax.daytrade_irrf_before %></td>
+            <td><%= number_to_currency @tax.fii_irrf_before %></td>
           </tr>
           <tr>
             <td>Imposto retido (IRRF) no mês</td>
-            <td colspan="3" class="text-center"><%= number_to_currency @tax.irrf %></td>
+            <td><%= number_to_currency @tax.common_irrf %></td>
+            <td><%= number_to_currency @tax.daytrade_irrf %></td>
+            <td><%= number_to_currency @tax.fii_irrf %></td>
           </tr>
           <tr>
             <td>Imposto retido (IRRF) a compensar</td>
-            <td colspan="3" class="text-center"><%= number_to_currency @tax.irrf_after %></td>
+            <td><%= number_to_currency @tax.common_irrf_after %></td>
+            <td><%= number_to_currency @tax.daytrade_irrf_after %></td>
+            <td><%= number_to_currency @tax.fii_irrf_after %></td>
+          </tr>
+          <tr>
+            <td>Imposto devido total</td>
+            <td colspan="2" class="text-center"><%= number_to_currency @tax.common_tax_due + @tax.daytrade_tax_due %></td>
+            <td><%= number_to_currency @tax.fii_tax_due %></td>
+          </tr>
+          <tr>
+            <td>Desconto de Imposto retido (IRRF)</td>
+            <td colspan="2" class="text-center"><%= number_to_currency @tax.common_irrf_before + @tax.daytrade_irrf_before + @tax.common_irrf + @tax.daytrade_irrf %></td>
+            <td><%= number_to_currency @tax.fii_irrf_before + @tax.fii_irrf %></td>
+          </tr>
+          <tr>
+            <td>Cálculo de DARF</td>
+            <td colspan="2" class="text-center"><%= number_to_currency @tax.common_daytrade_darf %></td>
+            <td><%= number_to_currency @tax.fii_darf %></td>
           </tr>
           <tr class="thead-light">
             <th>Imposto a pagar via DARF</th>

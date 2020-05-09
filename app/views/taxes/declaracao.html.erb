@@ -1,0 +1,418 @@
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-money-bill"></i> Declaração de Imposto de Renda de Pessoa Física referente ao ano calendário <strong><%= @year %></strong> a ser declarada em <%= @year + 1 %></div>
+  <div class="card-body">
+    <%= form_tag declaracao_path, method: :get, class: 'form-inline' do %>
+      <%= hidden_field_tag :discriminacao, @discriminacao %>
+      <%= select_tag :year, options_for_select((2010..Date.today.year).map { |y| ["Ano calendário: #{y - 1} / Ano declaração: #{y}", y - 1] }, @year), class: 'form-control mr-1', onchange: 'this.form.submit();' %>
+    <% end %>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-money-bill"></i> Declaração de ganhos e perdas em operações comuns e day-trade</div>
+  <div class="card-body">
+
+    <p>Acesse o menu <strong>Renda Variável >> Operações Comuns / Day-Trade</strong> e preencha conforme abaixo:</p>
+
+    <div class="row">
+      <div class="col-1">
+        <div class="nav flex-column nav-pills" id="vtab" role="tablist" aria-orientation="vertical">
+          <% I18n.t('date.abbr_month_names').compact.each.with_index do |month_name, month_index| %>
+          <a class="nav-link <%= 'active' if month_index == 0 %>" id="vtab-<%= month_name.downcase %>-tab" data-toggle="pill" href="#vtab-<%= month_name.downcase %>" role="tab" aria-controls="vtab-<%= month_name.downcase %>" aria-selected="true"><%= month_name.upcase %></a>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-11">
+        <div class="tab-content" id="vtab-content">
+          <% I18n.t('date.abbr_month_names').compact.each.with_index do |month_name, month_index| %>
+            <% tax = @taxes[month_index] %>
+            <div class="tab-pane fade show <%= 'active' if month_index == 0 %>" id="vtab-<%= month_name.downcase %>" role="tabpanel" aria-labelledby="vtab-<%= month_name.downcase %>-tab">
+
+            <table class="table table-hover table-striped table-responsive-sm table-sm">
+
+              <thead class="thead-dark">
+                <tr>
+                  <th>Mercado à Vista</th>
+                  <th>Operações Comuns</th>
+                  <th>Day-Trade</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Mercado à vista - ações</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.common_stocks_earnings.to_f.round(2), precision: 2 %>"></td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.daytrade_stocks_earnings.to_f.round(2), precision: 2 %>"></td>
+                </tr>
+                <tr>
+                  <td>Mercado à vista - ouro <span class="badge badge-secondary">NÃO CALCULADO</span></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                </tr>
+                <tr>
+                  <td>Mercado à vista - ouro at. fin. fora bolsa <span class="badge badge-secondary">NÃO CALCULADO</span></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                </tr>
+              </tbody>
+
+              <thead class="thead-dark">
+                <tr>
+                  <th>Mercado Opções</th>
+                  <th>Operações Comuns</th>
+                  <th>Day-Trade</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Mercado opções - ações</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.common_options_earnings.to_f.round(2), precision: 2 %>"></td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.daytrade_options_earnings.to_f.round(2), precision: 2 %>"></td>
+                </tr>
+                <tr>
+                  <td>Mercado opções - ouro <span class="badge badge-secondary">NÃO CALCULADO</span></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                </tr>
+                <tr>
+                  <td>Mercado opções - fora bolsa <span class="badge badge-secondary">NÃO CALCULADO</span></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                </tr>
+                <tr>
+                  <td>Mercado opções - outros <span class="badge badge-secondary">NÃO CALCULADO</span></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                </tr>
+              </tbody>
+
+              <thead class="thead-dark">
+                <tr>
+                  <th>Mercado Futuro</th>
+                  <th>Operações Comuns</th>
+                  <th>Day-Trade</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Mercado futuro - dólar dos EUA <span class="badge badge-secondary">NÃO CALCULADO</span></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                </tr>
+                <tr>
+                  <td>Mercado futuro - índices <span class="badge badge-secondary">NÃO CALCULADO</span></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                </tr>
+                <tr>
+                  <td>Mercado futuro - juros <span class="badge badge-secondary">NÃO CALCULADO</span></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                </tr>
+                <tr>
+                  <td>Mercado futuro - outros <span class="badge badge-secondary">NÃO CALCULADO</span></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                </tr>
+              </tbody>
+
+              <thead class="thead-dark">
+                <tr>
+                  <th>Mercado a Termo</th>
+                  <th>Operações Comuns</th>
+                  <th>Day-Trade</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Mercado a termo - ações/ouro <span class="badge badge-secondary">NÃO CALCULADO</span></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                </tr>
+                <tr>
+                  <td>Mercado a termo - outros <span class="badge badge-secondary">NÃO CALCULADO</span></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                  <td><input type="text" class="form-control form-control-sm" value="" disabled></td>
+                </tr>
+              </tbody>
+
+              <thead class="thead-dark">
+                <tr>
+                  <th>Resultados</th>
+                  <th>Operações Comuns</th>
+                  <th>Day-Trade</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>RESULTADO LÍQUIDO DO MÊS</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.common_earnings.to_f.round(2), precision: 2 %>" readonly></td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.daytrade_earnings.to_f.round(2), precision: 2 %>" readonly></td>
+                </tr>
+                <tr>
+                  <td>Resultado negativo até o mês anterior</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.common_losses_before.to_f.round(2), precision: 2 %>" <%= 'readonly' if month_index > 0 %>></td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.daytrade_losses_before.to_f.round(2), precision: 2 %>" <%= 'readonly' if month_index > 0 %>></td>
+                </tr>
+                <tr>
+                  <td>BASE DE CÁLCULO DO IMPOSTO</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.common_taxable_value.to_f.round(2), precision: 2 %>" readonly></td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.daytrade_taxable_value.to_f.round(2), precision: 2 %>" readonly></td>
+                </tr>
+                <tr>
+                  <td>Prejuízo a compensar</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.common_losses_after.to_f.round(2), precision: 2 %>" readonly></td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.daytrade_losses_after.to_f.round(2), precision: 2 %>" readonly></td>
+                </tr>
+                <tr>
+                  <td>Alíquota do imposto</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_to_percentage 100 * tax&.common_tax_aliquot.to_f, precision: 0 %>" readonly></td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_to_percentage 100 * tax&.daytrade_tax_aliquot.to_f, precision: 0 %>" readonly></td>
+                </tr>
+                <tr>
+                  <td>IMPOSTO DEVIDO</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.common_tax_due.to_f.round(2), precision: 2 %>" readonly></td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.daytrade_tax_due.to_f.round(2), precision: 2 %>" readonly></td>
+                </tr>
+              </tbody>
+
+              <thead class="thead-dark">
+                <tr>
+                  <th colspan="3">Consolidação do Mês</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="2">Total do imposto devido</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision (tax&.common_tax_due.to_f + tax&.daytrade_tax_due.to_f).round(2), precision: 2 %>" readonly></td>
+                </tr>
+                <tr>
+                  <td colspan="2">IR fonte de Day-Trade no mês</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.daytrade_irrf.to_f.round(2), precision: 2 %>" readonly></td>
+                </tr>
+                <tr>
+                  <td colspan="2">IR fonte de Day-Trade nos meses anteriores</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.daytrade_irrf_before.to_f.round(2), precision: 2 %>" readonly></td>
+                </tr>
+                <tr>
+                  <td colspan="2">IR fonte de Day-Trade a compensar</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.daytrade_irrf_after.to_f.round(2), precision: 2 %>" readonly></td>
+                </tr>
+                <tr>
+                  <td colspan="2">IR fonte (Lei nº 11.033/2004) no mês</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.common_irrf.to_f.round(2), precision: 2 %>" readonly></td>
+                </tr>
+                <tr>
+                  <td colspan="2">IR fonte (Lei nº 11.033/2004) nos meses anteriores</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.common_irrf_before.to_f.round(2), precision: 2 %>" readonly></td>
+                </tr>
+                <tr>
+                  <td colspan="2">IR fonte (Lei nº 11.033/2004) a compensar</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.common_irrf_after.to_f.round(2), precision: 2 %>" readonly></td>
+                </tr>
+                <tr>
+                  <td colspan="2">Imposto a pagar</td>
+                  <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision tax&.common_daytrade_darf.to_f.round(2), precision: 2 %>" readonly></td>
+                </tr>
+                <tr>
+                  <td colspan="2">Imposto pago</td>
+                  <td><input type="text" class="form-control form-control-sm" value="Valor de DARF pago"></td>
+                </tr>
+              </tbody>
+
+            </table>
+
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-money-bill"></i> Declaração de ganhos e perdas em operações com FIIs</div>
+  <div class="card-body">
+
+    <p>Acesse o menu <strong>Renda Variável >> Operações Fundos Invest. Imob.</strong> e preencha conforme abaixo:</p>
+
+    <table class="table table-hover table-striped table-responsive-sm table-sm">
+      <thead>
+        <tr>
+          <th>Mês</th>
+          <th>Resultado <br>líquido <br>do mês</th>
+          <th>Resultado <br>negativo <br>até o mês <br>anterior</th>
+          <th>Base de <br>cálculo do <br>imposto</th>
+          <th>Prejuízo a <br>compensar</th>
+          <th>Alíquota do <br>imposto</th>
+          <th>Imposto <br>devido</th>
+          <th>Situação do <br>imposto <br>retido <br>nos meses <br>anteriores <br>(Lei <br>11.033/2004)</th>
+          <th>Imposto <br>retido <br>no mês <br>(Lei <br>11.033/2004)</th>
+          <th>Imposto a <br>compensar <br>(Lei <br>11.033/2004)</th>
+          <th>Imposto <br>a pagar</th>
+          <th>Imposto <br>pago</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% I18n.t('date.abbr_month_names').compact.each.with_index do |month_name, month_index| %>
+          <% tax = @taxes[month_index] %>
+          <tr>
+            <th><%= month_name.upcase %></th>
+            <td><input type="text" class="form-control form-control-sm" style="width: 100px;" value="<%= number_with_precision tax&.fii_earnings.to_f.round(2), precision: 2 %>"></td>
+            <td>
+              <% if month_index == 0 %>
+                <input type="text" class="form-control form-control-sm" style="width: 100px;" value="<%= number_with_precision tax&.fii_losses_before.to_f.round(2), precision: 2 %>">
+              <% else %>
+                <%= number_with_precision tax&.fii_losses_before.to_f.round(2), precision: 2 %>
+              <% end %>
+            </td>
+            <td><%= number_with_precision tax&.fii_taxable_value.to_f.round(2), precision: 2 %></td>
+            <td><%= number_with_precision tax&.fii_losses_after.to_f.round(2), precision: 2 %></td>
+            <td><%= number_to_percentage 100 * tax&.fii_tax_aliquot.to_f, precision: 0 %></td>
+            <td><%= number_with_precision tax&.fii_tax_due.to_f.round(2), precision: 2 %></td>
+            <td><%= number_with_precision tax&.fii_irrf_before.to_f.round(2), precision: 2 %></td>
+            <td><input type="text" class="form-control form-control-sm" style="width: 100px;" value="<%= number_with_precision tax&.fii_irrf.to_f.round(2), precision: 2 %>"></td>
+            <td><%= number_with_precision tax&.fii_irrf_after.to_f.round(2), precision: 2 %></td>
+            <td><%= number_with_precision tax&.fii_darf.to_f.round(2), precision: 2 %></td>
+            <td><input type="text" class="form-control form-control-sm" style="width: 100px;" value="DARF"></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-money-bill"></i> Declaração de ganhos isentos com ações</div>
+  <div class="card-body">
+    <h6>Exemplo de declaração de ganhos isentos (quando vendas de ações no mês são inferiores a R$ 20.000,00):</h6>
+    <br>
+    <p><%= image_tag('declaracao/ganhos-isentos.png', style: 'width: 700px;', class: 'img-fluid') %></p>
+
+    <br>
+    <h6>Você deve declarar os seguintes ganhos:</h6>
+    <br>
+
+    <table class="table table-hover table-striped table-responsive-sm table-sm">
+      <thead class="thead-dark">
+        <tr>
+          <th>Código</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%
+          @taxes.each do |tax|
+            if tax.stocks_sales <= 20_000 && tax.stocks_taxfree_profits > 0
+        %>
+        <tr>
+          <td>20 - Ganhos líquidos em operações no mercado à vista de ações negociadas em bolsas de valores nas alienações realizadas até R$ 20.000,00 em cada mês, para o conjunto de ações</td>
+          <td><%= number_with_precision tax.stocks_taxfree_profits, precision: 2 %></td>
+        </tr>
+        <%
+            end
+          end
+        %>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-money-bill"></i> Declaração de posições</div>
+  <div class="card-body">
+
+    <h6>Exemplo de declaração de uma posição em Bens e Direitos:</h6>
+    <br>
+    <p><%= image_tag('declaracao/posicao-bens-e-direitos.png', style: 'width: 700px;', class: 'img-fluid') %></p>
+
+
+    <p>No campo abaixo você pode escrever um texto que será adicionado ao final de cada discriminação:</p>
+    <%= form_tag declaracao_path, method: :get, class: 'form-inline' do %>
+      <%= hidden_field_tag :year, @year %>
+      <%= text_field_tag :discriminacao, @discriminacao, class: 'form-control col-12 col-md-6' %>
+      <%= submit_tag 'Atualizar', class: 'btn btn-fill btn-secondary' %>
+    <% end %>
+
+    <br>
+
+    <table class="table table-hover table-striped table-responsive-sm table-sm">
+      <thead class="thead-dark">
+        <tr>
+          <th>Código</th>
+          <th>CNPJ</th>
+          <th>Discriminação</th>
+          <th>31/12/<%= @year - 1%></th>
+          <th>31/12/<%= @year %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <%
+          @assets.keys.sort.each do |asset_class|
+            @assets[asset_class].keys.sort.each do |asset_name|
+              asset_values = @assets[asset_class][asset_name]
+        %>
+        <tr>
+          <td>
+            <%=
+            case asset_class
+            when Asset::TYPE['acao']
+              '31 - Ações (inclusive as provenientes de linha telefônica).'
+            when Asset::TYPE['opcao']
+              '47 - Mercados futuros, de opções e a termo.'
+            when Asset::TYPE['fii']
+              '73 - Fundo de Investimento Imobiliário.'
+            end
+            %>
+          </td>
+          <td>
+            <% if asset_class != Asset::TYPE['opcao'] %>
+              <input type="text" class="form-control form-control-sm" value="<%= Ticker.where(ticker: asset_name).take&.cnpj_formatado %>">
+            <% end %>
+          </td>
+          <td><input type="text" class="form-control form-control-sm" value="<%= asset_name %>. <%= @discriminacao %>"></td>
+          <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision asset_values['before'] || 0, precision: 2 %>"></td>
+          <td><input type="text" class="form-control form-control-sm" value="<%= number_with_precision asset_values['current'] || 0, precision: 2 %>"></td>
+        </tr>
+        <%
+            end
+          end
+        %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-money-bill"></i> Declaração de proventos</div>
+  <div class="card-body">
+    <div class="alert alert-info d-inline-block">Você deve ter recebido cartas de escrituradores de ações informando os proventos recebidos no ano de <%= @year %>.</div>
+
+    <br>
+    <h6>Exemplo de carta:</h6>
+    <br>
+    <p><%= image_tag('declaracao/proventos-carta.png', style: 'width: 500px;', class: 'img-fluid') %></p>
+
+    <br>
+    <h6>Exemplo de declaração de juros sobre capital creditados e pagos:</h6>
+    <br>
+    <p><%= image_tag('declaracao/proventos-jcp-pago.png', style: 'width: 700px;', class: 'img-fluid') %></p>
+
+    <br>
+    <h6>Exemplo de declaração de juros sobre capital creditados e não pagos:</h6>
+    <br>
+    <p><%= image_tag('declaracao/proventos-jcp-nao-pago.png', style: 'width: 700px;', class: 'img-fluid') %></p>
+
+    <br>
+    <h6>Exemplo de declaração de dividendos:</h6>
+    <br>
+    <p><%= image_tag('declaracao/proventos-dividendos.png', style: 'width: 700px;', class: 'img-fluid') %></p>
+  </div>
+</div>

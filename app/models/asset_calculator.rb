@@ -20,7 +20,12 @@ class AssetCalculator
   end
 
   def calculate_and_save
+    last_order_year = nil
     session.orders.order(:ordered_at).order_by_type.each do |order|
+      if last_order_year && last_order_year != order.ordered_at.year
+        save_assets_at_end_of_year(last_order_year, order.ordered_at.year - 1)
+      end
+      last_order_year = order.ordered_at.year
       case order.order_type
       when Order::TYPE['compra']
         compra(order)
@@ -36,9 +41,16 @@ class AssetCalculator
         semisencao(order)
       end
     end
+    save_assets_at_end_of_year(last_order_year, Date.today.year)
     save_assets
     tax.calculate_and_save
     save_logs
+  end
+
+  def save_assets_at_end_of_year(year_first, year_last)
+    (year_first..year_last).each do |year|
+      AssetsEndOfYear.create!(session_id: session.id, year: year, assets: assets)
+    end
   end
 
   def save_assets
@@ -143,10 +155,12 @@ class AssetCalculator
 
   def compensacao(order)
     tax.compensacoes[order.ordered_at.beginning_of_month] = {
-      'common'   => order.accumulated_common,
-      'daytrade' => order.accumulated_daytrade,
-      'fii'      => order.accumulated_fii,
-      'irrf'     => order.accumulated_irrf,
+      'common'          => order.accumulated_common,
+      'daytrade'        => order.accumulated_daytrade,
+      'fii'             => order.accumulated_fii,
+      'irrf_common'     => order.accumulated_irrf, # consider IRRF for common
+      'irrf_daytrade'   => 0,
+      'irrf_fii'        => 0,
     }
   end
 

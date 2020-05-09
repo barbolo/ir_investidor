@@ -13,7 +13,8 @@ Rails.application.routes.draw do
   get 'operacoes/:secret', to: 'transactions#index', as: :transactions
   get 'posicoes/:secret', to: 'assets#index', as: :assets
   get 'impostos/:period/:secret', to: 'taxes#show', as: :taxes
+  get 'declaracao/:secret', to: 'taxes#declaracao', as: :declaracao
 
   # Sidekiq Web UI
-  mount Sidekiq::Web => '/sidekiq-admin'
+  mount Sidekiq::Web => '/sidekiq'
 end
