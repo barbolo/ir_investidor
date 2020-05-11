@@ -12,7 +12,7 @@ docker-compose build # cria imagens de Docker do projeto
 docker-compose run web bundle install # instala gems do projeto
 docker-compose run web rake db:create db:migrate db:seed # cria e prepara o banco de dados
 
-# exeção da aplicação:
+# execução da aplicação:
 docker-compose up
 ```
 
