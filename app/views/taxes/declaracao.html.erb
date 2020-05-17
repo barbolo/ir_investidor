@@ -17,7 +17,7 @@
     <p>Acesse o menu <strong>Renda Variável >> Operações Comuns / Day-Trade</strong> e preencha conforme abaixo:</p>
 
     <div class="row">
-      <div class="col-1">
+      <div class="col-1 d-print-none">
         <div class="nav flex-column nav-pills" id="vtab" role="tablist" aria-orientation="vertical">
           <% I18n.t('date.abbr_month_names').compact.each.with_index do |month_name, month_index| %>
           <a class="nav-link <%= 'active' if month_index == 0 %>" id="vtab-<%= month_name.downcase %>-tab" data-toggle="pill" href="#vtab-<%= month_name.downcase %>" role="tab" aria-controls="vtab-<%= month_name.downcase %>" aria-selected="true"><%= month_name.upcase %></a>
@@ -28,7 +28,8 @@
         <div class="tab-content" id="vtab-content">
           <% I18n.t('date.abbr_month_names').compact.each.with_index do |month_name, month_index| %>
             <% tax = @taxes[month_index] %>
-            <div class="tab-pane fade show <%= 'active' if month_index == 0 %>" id="vtab-<%= month_name.downcase %>" role="tabpanel" aria-labelledby="vtab-<%= month_name.downcase %>-tab">
+            <div class="tab-pane fade show d-print-block <%= 'active' if month_index == 0 %>" id="vtab-<%= month_name.downcase %>" role="tabpanel" aria-labelledby="vtab-<%= month_name.downcase %>-tab">
+            <p class="d-none d-print-block"><i class="fas fa-calendar"></i> <%= "#{month_name}/#{@year}" %></p>
 
             <table class="table table-hover table-striped table-responsive-sm table-sm">
 
@@ -231,6 +232,8 @@
   </div>
 </div>
 
+<div class="print-pagebreak"></div>
+
 <div class="card">
   <div class="card-header">
     <i class="fas fa-money-bill"></i> Declaração de ganhos e perdas em operações com FIIs</div>
@@ -285,13 +288,17 @@
   </div>
 </div>
 
+<div class="print-pagebreak"></div>
+
 <div class="card">
   <div class="card-header">
     <i class="fas fa-money-bill"></i> Declaração de ganhos isentos com ações</div>
   <div class="card-body">
-    <h6>Exemplo de declaração de ganhos isentos (quando vendas de ações no mês são inferiores a R$ 20.000,00):</h6>
-    <br>
-    <p><%= image_tag('declaracao/ganhos-isentos.png', style: 'width: 700px;', class: 'img-fluid') %></p>
+    <div class="d-print-none">
+      <h6>Exemplo de declaração de ganhos isentos (quando vendas de ações no mês são inferiores a R$ 20.000,00):</h6>
+      <br>
+      <p><%= image_tag('declaracao/ganhos-isentos.png', style: 'width: 700px;', class: 'img-fluid') %></p>
+    </div>
 
     <br>
     <h6>Você deve declarar os seguintes ganhos:</h6>
@@ -323,22 +330,25 @@
   </div>
 </div>
 
+<div class="print-pagebreak"></div>
+
 <div class="card">
   <div class="card-header">
     <i class="fas fa-money-bill"></i> Declaração de posições</div>
   <div class="card-body">
 
-    <h6>Exemplo de declaração de uma posição em Bens e Direitos:</h6>
-    <br>
-    <p><%= image_tag('declaracao/posicao-bens-e-direitos.png', style: 'width: 700px;', class: 'img-fluid') %></p>
+    <div class="d-print-none">
+      <h6>Exemplo de declaração de uma posição em Bens e Direitos:</h6>
+      <br>
+      <p><%= image_tag('declaracao/posicao-bens-e-direitos.png', style: 'width: 700px;', class: 'img-fluid') %></p>
 
-
-    <p>No campo abaixo você pode escrever um texto que será adicionado ao final de cada discriminação:</p>
-    <%= form_tag declaracao_path, method: :get, class: 'form-inline' do %>
-      <%= hidden_field_tag :year, @year %>
-      <%= text_field_tag :discriminacao, @discriminacao, class: 'form-control col-12 col-md-6' %>
-      <%= submit_tag 'Atualizar', class: 'btn btn-fill btn-secondary' %>
-    <% end %>
+      <p>No campo abaixo você pode escrever um texto que será adicionado ao final de cada discriminação:</p>
+      <%= form_tag declaracao_path, method: :get, class: 'form-inline' do %>
+        <%= hidden_field_tag :year, @year %>
+        <%= text_field_tag :discriminacao, @discriminacao, class: 'form-control col-12 col-md-6' %>
+        <%= submit_tag 'Atualizar', class: 'btn btn-fill btn-secondary' %>
+      <% end %>
+    </div>
 
     <br>
 
@@ -389,7 +399,9 @@
   </div>
 </div>
 
-<div class="card">
+<div class="print-pagebreak"></div>
+
+<div class="card d-print-none">
   <div class="card-header">
     <i class="fas fa-money-bill"></i> Declaração de proventos</div>
   <div class="card-body">
