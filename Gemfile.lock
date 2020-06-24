@@ -88,7 +88,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     puma (3.12.4)
     raabro (1.1.6)
-    rack (2.2.2)
+    rack (2.2.3)
     rack-protection (2.0.8.1)
       rack
     rack-test (1.1.0)
