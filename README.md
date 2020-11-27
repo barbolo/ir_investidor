@@ -47,7 +47,7 @@ executar os scripts.
 Exemplo de como executar um script de conversão de nota de corretagem:
 
 ```bash
-docker-compose run web bundle exec ruby scripts/clear.rb caminho/nota/corretagem.pdf
+docker-compose run web bundle exec ruby scripts/clear.rb diretorio/com/pdfs/de/notas/de/corretagem/da/clear/
 ```
 
 ## Premissas
