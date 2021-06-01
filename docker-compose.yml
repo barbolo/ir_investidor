@@ -1,7 +1,7 @@
 version: '3.2'
 services:
   db:
-    image: mysql:5.7.14
+    image: mysql:5
     ports: # this opens the guest MySQL port to the host OS
       - "3316:3316"
     environment:
@@ -9,7 +9,7 @@ services:
     command: mysqld --port 3316
 
   redis:
-    image: redis:4.0.14-alpine
+    image: redis:5-alpine
 
   web:
     build: .
