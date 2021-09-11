@@ -8,7 +8,7 @@ PDF_DIR = ARGV[0]
 
 if PDF_DIR.to_s.size == 0
   puts "Exemplo de uso do script:"
-  puts "ruby clear.rb diretorio/com/pdfs/de/notas/de/corretagem/da/clear/"
+  puts "ruby vitreo.rb diretorio/com/pdfs/de/notas/de/corretagem/da/vitreo/"
   exit
 end
 
@@ -62,7 +62,11 @@ def node_below(page, label)
 end
 
 def split_after(page, label)
-  page.find { |n| n['value'].to_s.match(label) }&.[]('value').to_s.split(label, 2).last.strip
+  anchor = page.find { |n| n['value'].to_s.match(label) }
+  return '' if !anchor
+  value = anchor['value'].to_s.split(label, 2).last.strip
+  return value if value.size > 0
+  page.find_all { |n| n['left'] >= anchor['right'] && close?(n['bottom'], anchor['bottom']) }.sort_by { |n| n['left'] }.first&.[]('value')
 end
 
 def process_pdf_path(path)
@@ -75,55 +79,58 @@ def process_pdf_path(path)
   pages.each_with_index do |page, i|
     _data_operacao   = node_below(page, /\AData preg.+o/i)&.[]('value')
     _data_liquidacao = split_after(page, /\AL.+quido para/i)
-    data_operacao    = _data_operacao if _data_operacao.to_s.match(/[0-9]/)
-    data_liquidacao  = _data_liquidacao if _data_liquidacao.to_s.match(/[0-9]/)
+    data_operacao    = _data_operacao if _data_operacao.to_s.match(/\A[0-9]{2}\/[0-9]{2}\/[0-9]{4}/)
+    data_liquidacao  = _data_liquidacao if _data_liquidacao.to_s.match(/\A[0-9]{2}\/[0-9]{2}\/[0-9]{4}/)
     data_liquidacao  ||= data_liquidacao_lista[i..-1].find { |d| d.to_s.strip.size > 0 }
 
     data_operacao_date = Date.strptime(data_operacao, '%d/%m/%Y')
 
     node = page.find { |n| n['value'].match(/Tipo mercado/) }
     headers = page.find_all { |n| close?(node['top'], n['top'], 1) }.sort_by { |n| n['left'] }
-    left_cv    = headers.find { |h| h['value'].match(/\AC\/V/i) }['left']
-    left_prazo = headers.find { |h| h['value'].match(/\APrazo/i) }['left']
-    left_obs   = headers.find { |h| h['value'].match(/\AObs/i) }['left']
-    left_preco = headers.find { |h| h['value'].match(/\APre.o .+ Ajuste/i) }['left']
+    left_cv     = headers.find { |h| h['value'].match(/\AC\/V/i) }['left']
+    left_prazo  = headers.find { |h| h['value'].match(/\APrazo/i) }['left']
+    right_prazo = headers.find { |h| h['value'].match(/\APrazo/i) }['right']
+    left_obs    = headers.find { |h| h['value'].match(/\AObs/i) }['left']
+    left_preco  = headers.find { |h| h['value'].match(/\APre.o .+ Ajuste/i) }['left']
 
-    page.each do |node|
-      if node['value'].match(/1\-BOVESPA/i)
-        row = page.find_all { |n| close?(node['top'], n['top'], 1) && n['left'] >= node['left'] }.sort_by { |n| n['left'] }
-        tipo_mercado = row.find_all { |n| n['left'] < left_prazo }.last['value']
-        empresa      = row.find_all { |n| n['left'] < left_obs }.last['raw']
-        ativo = case tipo_mercado
-                when /OPCAO/i
-                  'OPCAO'
-                when /VISTA|FRACION.RIO/i
-                  empresa.match(/\AFII\s+/i) ? 'FII' : 'ACAO'
-                else
-                  ''
-                end
-        if ativo == 'FII'
-          papel = empresa.split(/\s{2}\s+/)[1]
+    top = page.find { |n| n['value'].match(/\ANeg.+cios realizados\Z/i) }['bottom']
+    bottom = page.find { |n| n['value'].match(/\AResumo dos Neg.+cios\Z/i) }['top']
+    negocios = page.find_all { |n| n['top'] >= top && n['bottom'] <= bottom && n['left'] <= left_cv && n['value'].match(/BOVESPA/i) }
+
+    negocios.each do |node|
+      row = page.find_all { |n| close?(node['top'], n['top'], 0.5) && n['left'] >= node['left'] }.sort_by { |n| n['left'] }
+      tipo_mercado = row.find_all { |n| n['left'] < left_prazo }.last['value']
+      empresa      = row.find_all { |n| n['left'] >= right_prazo && n['right'] < left_obs }.map { |n| n['value'] }.join('    ')
+      ativo = case tipo_mercado
+              when /OPCAO/i
+                'OPCAO'
+              when /VISTA|FRACION.RIO/i
+                empresa.match(/\AFII\s+/i) ? 'FII' : 'ACAO'
+              else
+                ''
+              end
+      if ativo == 'FII'
+        papel = empresa.split(/\s{2}\s+/)[1]
+      else
+        empresa, tipo = empresa.split(/\s{2}\s+/, 2)
+        empresa = empresa.to_s.upcase.gsub(/\A\s*[0-9]{2}\/[0-9]{2}\s*/, '')
+        if papel = NOME_PAPEL[empresa]
+          papel += TIPO_NUMERO[tipo.split(/\s/, 2).first.to_s.upcase].to_s
         else
-          empresa, tipo = empresa.split(/\s{2}\s+/, 2)
-          empresa = empresa.to_s.upcase.gsub(/\A\s*[0-9]{2}\/[0-9]{2}\s*/, '')
-          if papel = NOME_PAPEL[empresa]
-            papel += TIPO_NUMERO[tipo.split(/\s/).first.to_s.upcase].to_s
-          else
-            papel = empresa
-          end
+          papel = empresa
         end
-        operacao = {}
-        operacao['DATA OPERACAO']   = data_operacao
-        operacao['DATA LIQUIDACAO'] = data_liquidacao
-        operacao['ATIVO']           = ativo
-        operacao['OPERACAO']        = row.find { |n| n['left'] >= left_cv }['value'][0].upcase == 'C' ? 'COMPRA' : 'VENDA'
-        operacao['DAYTRADE?']       = 'N'
-        operacao['QTD']             = row.find_all { |n| n['left'] < left_preco }.last['value'].to_i
-        operacao['PRECO']           = row.find { |n| n['left'] >= left_preco }['value'].gsub('.', '').gsub(',', '.').to_f.round(2)
-        $operacoes[data_operacao_date] ||= {}
-        $operacoes[data_operacao_date][papel] ||= []
-        $operacoes[data_operacao_date][papel] << operacao
       end
+      operacao = {}
+      operacao['DATA OPERACAO']   = data_operacao
+      operacao['DATA LIQUIDACAO'] = data_liquidacao
+      operacao['ATIVO']           = ativo
+      operacao['OPERACAO']        = row.find { |n| n['left'] >= left_cv }['value'][0].upcase == 'C' ? 'COMPRA' : 'VENDA'
+      operacao['DAYTRADE?']       = 'N'
+      operacao['QTD']             = row.find_all { |n| n['left'] < left_preco }.last['value'].to_i
+      operacao['PRECO']           = row.find { |n| n['left'] >= left_preco }['value'].gsub('.', '').gsub(',', '.').to_f.round(2)
+      $operacoes[data_operacao_date] ||= {}
+      $operacoes[data_operacao_date][papel] ||= []
+      $operacoes[data_operacao_date][papel] << operacao
     end
   end
 end
