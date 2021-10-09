@@ -118,7 +118,7 @@ def process_pdf_path(path)
         operacao['ATIVO']           = ativo
         operacao['OPERACAO']        = row.find { |n| n['left'] >= left_cv }['value'][0].upcase == 'C' ? 'COMPRA' : 'VENDA'
         operacao['DAYTRADE?']       = 'N'
-        operacao['QTD']             = row.find_all { |n| n['left'] < left_preco }.last['value'].to_i
+        operacao['QTD']             = row.find_all { |n| n['left'] < left_preco }.last['value'].gsub('.', '').to_i
         operacao['PRECO']           = row.find { |n| n['left'] >= left_preco }['value'].gsub('.', '').gsub(',', '.').to_f.round(2)
         $operacoes[data_operacao_date] ||= {}
         $operacoes[data_operacao_date][papel] ||= []
